@@ -1,0 +1,28 @@
+{
+  "events": [
+    {
+      "eventTitle": "camera-market-search",
+      "eventDescription": "Used camera cross-shop search",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "watch-market-search",
+      "eventDescription": "Used watch cross-shop search",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "luxury-market-search",
+      "eventDescription": "Used luxury brand cross-shop search",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "instrument-market-search",
+      "eventDescription": "Used instrument cross-shop search",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
+    }
+  ]
+}
