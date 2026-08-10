@@ -62,9 +62,9 @@ async def main() -> int:
                     print(f"    Tools: {tool_names}")
                     expected = {"search_camera_market", "search_watch_market",
                                 "search_luxury_market", "search_instrument_market",
-                                "search_offmall_market"}
+                                "search_offmall_market", "search_kakaku_prices"}
                     if expected.issubset(set(tool_names)):
-                        green(f"tools/list returns {len(tool_names)} tools (all 4 expected)")
+                        green(f"tools/list returns {len(tool_names)} tools (all 6 expected)")
                     else:
                         missing = expected - set(tool_names)
                         red(f"tools/list missing: {missing} (got {tool_names})")

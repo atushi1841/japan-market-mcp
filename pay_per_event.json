@@ -29,6 +29,12 @@
       "eventDescription": "OffMall used goods search (800+ Hard Off stores)",
       "eventPriceUsd": 0.001,
       "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "kakaku-price-search",
+      "eventDescription": "Kakaku.com price comparison search",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
     }
   ]
 }

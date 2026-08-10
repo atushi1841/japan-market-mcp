@@ -20,6 +20,7 @@ from server import (
     _format_luxury_results,
     _format_instrument_results,
     _format_offmall_results,
+    _format_kakaku_results,
 )
 
 
@@ -125,6 +126,23 @@ def test_format_empty():
     assert "検索結果はありませんでした" in out
 
 
+def test_format_kakaku_results():
+    result = {
+        "items": [
+            {"title": "iPhone 17e", "maker": "Apple", "price": 101799, "priceType": "端末価格",
+             "shopCount": 149, "review": "4.25 (44)", "productUrl": "https://kakaku.com/model/M1"},
+        ],
+        "runId": "run-kakaku-1",
+        "datasetId": "ds-kakaku-1",
+    }
+    out = _format_kakaku_results(result)
+    assert "価格.com" in out
+    assert "iPhone 17e" in out
+    assert "¥101,799" in out
+    assert "149店舗" in out
+    assert "4.25 (44)" in out
+
+
 if __name__ == "__main__":
     tests = [
         test_format_camera_results,
@@ -132,6 +150,7 @@ if __name__ == "__main__":
         test_format_luxury_results,
         test_format_instrument_results,
         test_format_offmall_results,
+        test_format_kakaku_results,
         test_format_empty,
     ]
     for t in tests:

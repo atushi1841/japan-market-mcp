@@ -37,6 +37,7 @@ WATCH_ACTOR_ID = "gMqdrS2evpcybSZc2"           # japan-watch-market-scraper
 LUXURY_ACTOR_ID = "b0vuqa3ESvy2mOwFB"          # japan-luxury-brand-market-scraper
 INSTRUMENT_ACTOR_ID = "yN1R26HrV6C2MBKas"      # japan-used-instrument-market-scraper
 OFFMALL_ACTOR_ID = "Zh4kqcS4dYPWpFzBd"          # japan-offmall-market-scraper
+KAKAKU_ACTOR_ID = "XOqsB7rCHYrb42kcY"            # japan-kakaku-price-search
 
 # Apify API エンドポイント
 APIFY_API_BASE = "https://api.apify.com/v2"
@@ -238,6 +239,40 @@ def _format_offmall_results(result: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_kakaku_results(result: dict[str, Any]) -> str:
+    """価格.com検索結果用フォーマッター（最安価格・店舗数・レビュー）"""
+    items = result.get("items", [])
+    run_id = result.get("runId", "")
+    dataset_id = result.get("datasetId", "")
+    if not items:
+        return f"**価格.com 検索結果**: 0件\n\nRun ID: `{run_id}`\nデータセット: `{dataset_id}`"
+
+    lines = [
+        f"**価格.com（日本最大級の価格比較サイト）検索結果** ({len(items)}件)",
+        "",
+    ]
+    for i, it in enumerate(items, 1):
+        title = it.get("title", "")
+        maker = it.get("maker", "")
+        price = it.get("price")
+        price_type = it.get("priceType", "")
+        shop_count = it.get("shopCount", 0)
+        review = it.get("review", "")
+        url = it.get("productUrl", "")
+        price_str = f"¥{price:,}" if isinstance(price, int) else str(price or "?")
+        maker_str = f" [{maker}]" if maker else ""
+        shops_str = f"（{shop_count}店舗）" if shop_count else ""
+        review_str = f" 評価: {review}" if review else ""
+        type_str = f" {price_type}" if price_type else ""
+        lines.append(f"{i}. **{title}**{maker_str}")
+        lines.append(f"   最安価格: {price_str}{type_str}{shops_str}{review_str}")
+        lines.append(f"   出典: 価格.com | {url}")
+        lines.append("")
+    lines.append(f"Run ID: `{run_id}`")
+    lines.append(f"データセット: `{dataset_id}`")
+    return "\n".join(lines)
+
+
 # ──────────────────────────────────────────────
 # サーバー構築
 # ──────────────────────────────────────────────
@@ -400,6 +435,34 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(OFFMALL_ACTOR_ID, actor_input, "Japan OffMall Used Goods Market")
         text_output = _format_offmall_results(result)
+        return {"type": "text", "text": text_output, "structuredContent": result}
+
+    # ──────────────────────────────────────────────
+    # Tool 6: 価格.com キーワード価格検索
+    # ──────────────────────────────────────────────
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def search_kakaku_prices(
+        keyword: str = "iPhone",
+        max_results: int = 10,
+    ) -> dict:
+        """日本の最大級価格比較サイト「価格.com」で商品の最安価格・店舗数・評価を検索します。
+
+        数千の日本国内オンライン店舗（Amazon, ヨドバシ, ビックカメラ, 楽天など）の集約価格を
+        一括で取得できるため、家電・スマホ・PCパーツなどの日本市場価格調査に最適です。
+
+        Args:
+            keyword: 検索キーワード（例: "iPhone", "PS5", "RTX 5080", "一眼レフ"）
+            max_results: 取得する最大件数（デフォルト 10, 最大 50）
+        """
+        await Actor.charge("kakaku-price-search")
+
+        actor_input = {
+            "keyword": keyword,
+            "maxItems": min(max_results, 50),
+            "maxPages": 1,
+        }
+        result = await _call_actor(KAKAKU_ACTOR_ID, actor_input, "Japan Kakaku Price Search")
+        text_output = _format_kakaku_results(result)
         return {"type": "text", "text": text_output, "structuredContent": result}
 
     return server
