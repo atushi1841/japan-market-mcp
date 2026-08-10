@@ -19,6 +19,7 @@ from server import (
     _format_watch_results,
     _format_luxury_results,
     _format_instrument_results,
+    _format_offmall_results,
 )
 
 
@@ -68,6 +69,23 @@ def test_format_watch_results():
     assert "Jackroad" in out
 
 
+def test_format_offmall_results():
+    result = {
+        "items": [
+            {"title": "iPhone 11", "price": 27500, "brand": "APPLE", "rank": "S",
+             "modelCode": "MWLX2J/A", "productUrl": "https://netmall.hardoff.co.jp/product/1/"},
+        ],
+        "runId": "run-offmall-1",
+        "datasetId": "ds-offmall-1",
+    }
+    out = _format_offmall_results(result)
+    assert "オフモール" in out
+    assert "iPhone 11" in out
+    assert "¥27,500" in out
+    assert "ランクS" in out
+    assert "OffMall" in out
+
+
 def test_format_luxury_results():
     result = {
         "items": [
@@ -113,6 +131,7 @@ if __name__ == "__main__":
         test_format_watch_results,
         test_format_luxury_results,
         test_format_instrument_results,
+        test_format_offmall_results,
         test_format_empty,
     ]
     for t in tests:

@@ -36,6 +36,7 @@ CAMERA_ACTOR_ID = "mQaZFo6up4YZKepC3"          # japan-used-camera-market-scrape
 WATCH_ACTOR_ID = "gMqdrS2evpcybSZc2"           # japan-watch-market-scraper
 LUXURY_ACTOR_ID = "b0vuqa3ESvy2mOwFB"          # japan-luxury-brand-market-scraper
 INSTRUMENT_ACTOR_ID = "yN1R26HrV6C2MBKas"      # japan-used-instrument-market-scraper
+OFFMALL_ACTOR_ID = "Zh4kqcS4dYPWpFzBd"          # japan-offmall-market-scraper
 
 # Apify API エンドポイント
 APIFY_API_BASE = "https://api.apify.com/v2"
@@ -206,6 +207,37 @@ def _format_instrument_results(result: dict[str, Any]) -> str:
     return _fmt_market_results(result, "中古楽器市場（デジマート+イシバシ）")
 
 
+def _format_offmall_results(result: dict[str, Any]) -> str:
+    """オフモール結果用フォーマッター（shopは常にOffMall）"""
+    items = result.get("items", [])
+    run_id = result.get("runId", "")
+    dataset_id = result.get("datasetId", "")
+    if not items:
+        return f"**オフモール（ハードオフ公式800店舗）検索結果**: 0件\n\nRun ID: `{run_id}`\nデータセット: `{dataset_id}`"
+
+    lines = [
+        f"**オフモール（ハードオフ公式800店舗）検索結果** ({len(items)}件)",
+        "",
+    ]
+    for i, it in enumerate(items, 1):
+        title = it.get("title", "")
+        brand = it.get("brand", "")
+        price = it.get("price")
+        rank = it.get("rank", "")
+        url = it.get("productUrl", "")
+        model = it.get("modelCode", "")
+        price_str = f"¥{price:,}" if isinstance(price, int) else str(price or "?")
+        rank_str = f" [ランク{rank}]" if rank else ""
+        model_str = f" [{model}]" if model else ""
+        lines.append(f"{i}. **{title}**{model_str}{rank_str} {brand}")
+        lines.append(f"   価格: {price_str}")
+        lines.append(f"   出典: OffMall | {url}")
+        lines.append("")
+    lines.append(f"Run ID: `{run_id}`")
+    lines.append(f"データセット: `{dataset_id}`")
+    return "\n".join(lines)
+
+
 # ──────────────────────────────────────────────
 # サーバー構築
 # ──────────────────────────────────────────────
@@ -337,6 +369,37 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(INSTRUMENT_ACTOR_ID, actor_input, "Japan Used Instrument Market")
         text_output = _format_instrument_results(result)
+        return {"type": "text", "text": text_output, "structuredContent": result}
+
+    # ──────────────────────────────────────────────
+    # Tool 5: オフモール 中古総合マーケット
+    # ──────────────────────────────────────────────
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def search_offmall_market(
+        keyword: str = "iPhone",
+        max_results: int = 10,
+        category: str = "",
+    ) -> dict:
+        """日本の総合中古EC「オフモール」（ハードオフ公式・全国800店舗以上）を検索します。
+
+        カメラ、時計、楽器、ブランド品、スマホ、ゲーム機など13カテゴリをカバーする
+        日本最大級のリユース市場。条件ランク（S/A/B/C）付きの実物中古品が検索できます。
+
+        Args:
+            keyword: 検索キーワード（例: "iPhone", "ロレックス", "ニンテンドー"）。空欄+category指定でカテゴリスキャン
+            max_results: 取得する最大件数（デフォルト 10, 最大 50）
+            category: カテゴリ指定（キーワード空欄時）: カメラ, 時計, 楽器, ブランド品, スマートフォン・携帯電話, ゲーム機 など
+        """
+        await Actor.charge("offmall-market-search")
+
+        actor_input = {
+            "searchKeyword": keyword,
+            "maxItems": min(max_results, 50),
+            "maxPages": 2,
+            "category": category,
+        }
+        result = await _call_actor(OFFMALL_ACTOR_ID, actor_input, "Japan OffMall Used Goods Market")
+        text_output = _format_offmall_results(result)
         return {"type": "text", "text": text_output, "structuredContent": result}
 
     return server

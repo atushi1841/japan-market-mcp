@@ -23,6 +23,12 @@
       "eventDescription": "Used instrument cross-shop search",
       "eventPriceUsd": 0.001,
       "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "offmall-market-search",
+      "eventDescription": "OffMall used goods search (800+ Hard Off stores)",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
     }
   ]
 }
