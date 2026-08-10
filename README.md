@@ -25,6 +25,25 @@ Pay per event — 各検索 **$0.001/search** + Actor実行費。
 
 Store の Run ボタンから起動し、MCPエンドポイント（Streamable HTTP）を MCPクライアント（Claude Desktop, Cursor, VS Code等）に接続します。
 
+**MCPクライアント設定（Claude Desktop / Cursor等）:**
+
+```json
+{
+  "mcpServers": {
+    "japan-market-mcp": {
+      "url": "https://YOUR-USERNAME--japan-market-mcp.apify.actor/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_APIFY_TOKEN"
+      }
+    }
+  }
+}
+```
+
+- **URL形式**: `<your-username>--<actor-name>.apify.actor/mcp`（例: `https://fruitful_quintessence--japan-market-mcp.apify.actor/mcp`）
+- **認証**: Apify APIトークンを `Authorization: Bearer` ヘッダーで付与（Apify Console → Settings → Integrations から取得）
+- **起動**: StoreのRunボタンで起動後、Standbyモードで常駐し `/mcp` エンドポイントが公開されます
+
 ### ローカル開発
 
 ```bash
