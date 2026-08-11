@@ -12,6 +12,9 @@
 | `search_watch_market` | 中古時計 | ジャックロード + キタムラ中古時計 |
 | `search_luxury_market` | 中古ブランド品 | コメ兵（バッグ/財布/ジュエリー/時計）+ ジャックロード |
 | `search_instrument_market` | 中古楽器 | デジマート + イシバシ楽器U-BOX |
+| `search_offmall_market` | 中古総合 | オフモール（ハードオフ公式800店舗） |
+| `search_kakaku_prices` | 価格.com | 日本全国オンライン店舗の最安価格 |
+| `search_car_market` | 中古車 | goo-net（全国・車体タイプ別） |
 
 各ツールはキーワード（例: "SONY α7", "ROLEX", "エルメス", "Fender"）を入力すると、対象店舗から横断的に商品を収集し、価格・ブランド・状態・出典店舗を返します。
 
