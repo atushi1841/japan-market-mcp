@@ -38,6 +38,7 @@ LUXURY_ACTOR_ID = "b0vuqa3ESvy2mOwFB"          # japan-luxury-brand-market-scrap
 INSTRUMENT_ACTOR_ID = "yN1R26HrV6C2MBKas"      # japan-used-instrument-market-scraper
 OFFMALL_ACTOR_ID = "Zh4kqcS4dYPWpFzBd"          # japan-offmall-market-scraper
 KAKAKU_ACTOR_ID = "XOqsB7rCHYrb42kcY"            # japan-kakaku-price-search
+GOO_NET_ACTOR_ID = "bgm5Gxn4BeBmoO7xD"           # goo-net-car-scraper
 
 # Apify API エンドポイント
 APIFY_API_BASE = "https://api.apify.com/v2"
@@ -171,7 +172,7 @@ def _fmt_market_results(result: dict[str, Any], market_name: str) -> str:
         shop = item.get("shop") or ""
         brand = item.get("brand") or ""
         condition = item.get("condition") or ""
-        url = item.get("productUrl") or item.get("item_url") or item.get("url") or ""
+        url = item.get("productUrl") or item.get("item_url") or item.get("url") or item.get("detailUrl") or ""
 
         price_str = _fmt_price(price) if isinstance(price, (int, float)) else f"{price}"
         shop_str = f" [{shop}]" if shop else ""
@@ -463,6 +464,31 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(KAKAKU_ACTOR_ID, actor_input, "Japan Kakaku Price Search")
         text_output = _format_kakaku_results(result)
+        return {"type": "text", "text": text_output, "structuredContent": result}
+
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def search_car_market(
+        body_type: str = "SUV",
+        max_results: int = 10,
+    ) -> dict:
+        """日本最大級の中古車ポータル「goo-net」で、車体タイプ別に在庫車両を検索します。
+
+        車名・価格（円）・メーカー・販売店・詳細URLが取得できます。中古車輸出業者や
+        JDM（日本仕様車）調査、相場確認に最適です。
+
+        Args:
+            body_type: 車体タイプ（SUV, SEDAN, MINIVAN, KEI, WAGON, COUPE, COMPACT, OPEN, BUS, KEITRUCK）
+            max_results: 取得する最大件数（デフォルト 10, 最大 50）
+        """
+        await Actor.charge("car-market-search")
+
+        actor_input = {
+            "bodyType": body_type,
+            "maxItems": min(max_results, 50),
+            "maxPages": 2,
+        }
+        result = await _call_actor(GOO_NET_ACTOR_ID, actor_input, "Goo-net Japan Used Cars")
+        text_output = _fmt_market_results(result, "中古車市場（goo-net 全国）")
         return {"type": "text", "text": text_output, "structuredContent": result}
 
     return server

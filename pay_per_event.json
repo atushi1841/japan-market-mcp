@@ -35,6 +35,12 @@
       "eventDescription": "Kakaku.com price comparison search",
       "eventPriceUsd": 0.001,
       "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "car-market-search",
+      "eventDescription": "Goo-net used car search by body type",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
     }
   ]
 }
