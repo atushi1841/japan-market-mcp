@@ -1,40 +1,40 @@
-# Japan Market MCP — 日本の複数店舗横断比較 MCPサーバー
+# Japan Market MCP — Cross-Shop Price Comparison for AI Agents
 
-**AIエージェントから日本の4市場（中古カメラ・時計・ブランド品・楽器）の店舗間価格比較ができるMCPサーバー。**
+An **MCP server** that lets AI agents (Claude, Cursor, VS Code Copilot, ChatGPT) compare used-good prices across leading Japanese shops in a single tool call. Instead of scraping site by site, an agent queries one server and gets inter-store price gaps for the same product — perfect for **reseller arbitrage**, **price monitoring**, and **market research** on the Japanese second-hand market.
 
-4つの横断比較アクター（Japan Used Camera / Watch / Luxury Brand / Instrument Market）を1つのMCPサーバーに統合。同一モデルの店舗間価格差（転売利ざや・相場調査）をAIエージェントから直接検索できます。
+## How it works
 
-## 提供ツール
+The server wraps 7 market-scraping actors behind one MCP endpoint. Each tool returns price, brand, shop, condition and a link per item, with the shop-pair crossed so you see the price spread at a glance.
 
-| ツール | 市場 | 対象店舗 |
+## Available tools
+
+| Tool | Market | Shop pair |
 |---|---|---|
-| `search_camera_market` | 中古カメラ | キタムラ + フジヤカメラ |
-| `search_watch_market` | 中古時計 | ジャックロード + キタムラ中古時計 |
-| `search_luxury_market` | 中古ブランド品 | コメ兵（バッグ/財布/ジュエリー/時計）+ ジャックロード |
-| `search_instrument_market` | 中古楽器 | デジマート + イシバシ楽器U-BOX |
-| `search_offmall_market` | 中古総合 | オフモール（ハードオフ公式800店舗） |
-| `search_kakaku_prices` | 価格.com | 日本全国オンライン店舗の最安価格 |
-| `search_car_market` | 中古車 | goo-net（全国・車体タイプ別） |
+| `search_camera_market` | Used cameras & lenses | Kitamura + Fujiya Camera |
+| `search_watch_market` | Luxury watches | Jackroad + Kitamura used watches |
+| `search_luxury_market` | Used luxury brands | Komehyo + Jackroad |
+| `search_instrument_market` | Used instruments | Digimart + Ishibashi U-BOX |
+| `search_offmall_market` | General used goods | OffMall (Hard Off official, 800+ stores) |
+| `search_kakaku_prices` | New price comparison | Kakaku.com (aggregated, thousands of shops) |
+| `search_car_market` | Used cars | goo-net (nationwide, by body type) |
 
-各ツールはキーワード（例: "SONY α7", "ROLEX", "エルメス", "Fender"）を入力すると、対象店舗から横断的に商品を収集し、価格・ブランド・状態・出典店舗を返します。
+Each tool takes a keyword (e.g. `SONY α7`, `ROLEX`, `Hermes`, `Fender`) and returns results from the crossed shops. Leaving the keyword empty scans the full category.
 
-## 価格
+## Pricing
 
-Pay per event — 各検索 **$0.001/search** + Actor実行費。
+Pay per event — **$0.001 per search** + actor start fee. Runs finish in seconds, so a full keyword lookup typically costs well under $0.01.
 
-## 接続方法
+## Connect as an MCP server
 
-### Apify上のMCPサーバーとして
+Run it from the Apify Store (Run button), then point your MCP client at the endpoint. It stays in standby mode.
 
-Store の Run ボタンから起動し、MCPエンドポイント（Streamable HTTP）を MCPクライアント（Claude Desktop, Cursor, VS Code等）に接続します。
-
-**MCPクライアント設定（Claude Desktop / Cursor等）:**
+**MCP client config (Claude Desktop / Cursor / VS Code):**
 
 ```json
 {
   "mcpServers": {
     "japan-market-mcp": {
-      "url": "https://YOUR-USERNAME--japan-market-mcp.apify.actor/mcp",
+      "url": "https://fruitful_quintessence--japan-market-mcp.apify.actor/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_APIFY_TOKEN"
       }
@@ -43,43 +43,44 @@ Store の Run ボタンから起動し、MCPエンドポイント（Streamable H
 }
 ```
 
-- **URL形式**: `<your-username>--<actor-name>.apify.actor/mcp`（例: `https://fruitful_quintessence--japan-market-mcp.apify.actor/mcp`）
-- **認証**: Apify APIトークンを `Authorization: Bearer` ヘッダーで付与（Apify Console → Settings → Integrations から取得）
-- **起動**: StoreのRunボタンで起動後、Standbyモードで常駐し `/mcp` エンドポイントが公開されます
+- **URL**: `<your-username>--japan-market-mcp.apify.actor/mcp`
+- **Auth**: Apify API token in the `Authorization: Bearer` header (Apify Console → Settings → Integrations)
 
-### ローカル開発
+## Example agent prompts
+
+```
+"Compare used prices for Sony a7 III between Kitamura and Fujiya"
+→ search_camera_market(keyword="SONY α7 III")
+
+"What's the inter-store price gap for a Rolex Submariner?"
+→ search_watch_market(keyword="ROLEX Submariner")
+
+"What's the market price for a Hermes Birkin 25?"
+→ search_luxury_market(keyword="Hermes Birkin 25")
+
+"What's a used Fender Stratocaster going for?"
+→ search_instrument_market(keyword="Fender Stratocaster")
+```
+
+## Use cases
+
+- **Reseller arbitrage** — spot the same product priced differently across shops
+- **Market research** — track used prices for cameras, watches, luxury goods, instruments, cars
+- **Export sourcing** — goo-net JDM inventory and goo-net price checks for exporters
+- **Collector price checks** — condition-ranked physical used items from OffMall
+
+## Data sources
+
+- Each actor collects **factual data only** (product name, price, brand, condition, inventory, URL). No photos or descriptions are harvested.
+- All target sites allow crawling via their `robots.txt`.
+
+## Local development
 
 ```bash
 pip install -r requirements.txt
 APIFY_TOKEN=apify_api_xxx python -m src.main
-# http://localhost:3000/mcp でStreamable HTTPエンドポイントが起動
+# Streamable HTTP endpoint at http://localhost:3000/mcp
 ```
-
-## ツールの使用例
-
-```
-"SONY α7 IIIの中古価格をキタムラとフジヤで比較して"
-→ search_camera_market(keyword="SONY α7 III")
-
-"ROLEXサブマリーナーの店舗間価格差を教えて"
-→ search_watch_market(keyword="ROLEX サブマリーナー")
-
-"エルメスのバーキン25の相場は？"
-→ search_luxury_market(keyword="エルメス バーキン 25")
-
-"Fenderストラトキャスターの中古相場"
-→ search_instrument_market(keyword="Fender Stratocaster")
-```
-
-## データソース
-
-- 各アクターは **事実データのみ**（商品名・価格・ブランド・状態・在庫・登録日）を収集。写真・説明文は取得しません
-- 対象サイトのrobots.txtは全てクロール許可
-- 詳細は各MarketアクターのREADME参照:
-  - [japan-used-camera-market-scraper](https://apify.com/fruitful_quintessence/japan-used-camera-market-scraper)
-  - [japan-watch-market-scraper](https://apify.com/fruitful_quintessence/japan-watch-market-scraper)
-  - [japan-luxury-brand-market-scraper](https://apify.com/fruitful_quintessence/japan-luxury-brand-market-scraper)
-  - [japan-used-instrument-market-scraper](https://apify.com/fruitful_quintessence/japan-used-instrument-market-scraper)
 
 ## License
 

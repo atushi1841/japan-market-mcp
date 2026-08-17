@@ -294,14 +294,14 @@ def get_server() -> FastMCP:
         max_results: int = 10,
         sources: str = "kitamura,fujiya",
     ) -> dict:
-        """日本の複数店舗（キタムラ+フジヤカメラ）の中古カメラ・レンズ価格を横断比較します。
+        """Compare used camera & lens prices across Japanese shops (Kitamura + Fujiya Camera).
 
-        同じカメラモデルの店舗間価格差（転売利ざや・相場調査）が分かります。
+        Finds the same camera model sold at multiple stores to expose inter-store price gaps — ideal for reseller arbitrage and market research. Supports Canon, Nikon, Sony, Fujifilm, Pentax, Leica.
 
         Args:
-            keyword: 検索キーワード（例: "SONY α7", "NIKON Z9", "Canon RF"）
-            max_results: 取得する最大件数（デフォルト 10, 最大 50）
-            sources: 取得ソース（カンマ区切り: kitamura, fujiya）
+            keyword: search keyword (examples: SONY alpha7, NIKON Z9, Canon RF)
+            max_results: max number of results (default 10, max 50)
+            sources: comma-separated sources: kitamura, fujiya
         """
         await Actor.charge("camera-market-search")
 
@@ -324,14 +324,14 @@ def get_server() -> FastMCP:
         max_results: int = 10,
         sources: str = "jackroad,kitamura",
     ) -> dict:
-        """日本の複数店舗（ジャックロード+キタムラ中古時計）の高級時計価格を横断比較します。
+        """Compare luxury watch prices across Japanese shops (Jackroad + Kitamura used watches).
 
-        ROLEX、OMEGA、グランドセイコーなどのブランド別・モデル別の店舗間価格差が分かります。
+        Exposes inter-store price gaps for ROLEX, OMEGA, Grand Seiko, Patek Philippe, Cartier, IWC — by brand and model. Ideal for reseller arbitrage and market research.
 
         Args:
-            keyword: 検索キーワード（例: "ROLEX", "OMEGA", "グランドセイコー"）
-            max_results: 取得する最大件数（デフォルト 10, 最大 50）
-            sources: 取得ソース（カンマ区切り: jackroad, kitamura）
+            keyword: search keyword (examples: ROLEX, OMEGA, Grand Seiko)
+            max_results: max number of results (default 10, max 50)
+            sources: comma-separated sources: jackroad, kitamura
         """
         await Actor.charge("watch-market-search")
 
@@ -354,15 +354,14 @@ def get_server() -> FastMCP:
         max_results: int = 10,
         sources: str = "komehyo,jackroad",
     ) -> dict:
-        """日本の複数店舗（コメ兵カテゴリ+ジャックロード）の中古ブランド品価格を横断比較します。
+        """Compare used luxury brand prices across Japanese shops (Komehyo categories + Jackroad).
 
-        エルメス、ルイヴィトン、シャネルなどのバッグ・財布・ジュエリー・時計の
-        店舗間価格差が分かります。キーワード空欄でカテゴリ全体をスキャンします。
+        Handbags, wallets, jewelry and watches from Hermes, Louis Vuitton, Chanel, Gucci, Dior, YSL. Leave keyword empty to scan the full category.
 
         Args:
-            keyword: 検索キーワード（例: "エルメス", "ルイヴィトン"）。空欄=カテゴリ全体スキャン
-            max_results: 取得する最大件数（デフォルト 10, 最大 50）
-            sources: 取得ソース（カンマ区切り: komehyo, jackroad）
+            keyword: search keyword (examples: Hermes, Louis Vuitton, Chanel). Empty = full category scan
+            max_results: max number of results (default 10, max 50)
+            sources: comma-separated sources: komehyo, jackroad
         """
         await Actor.charge("luxury-market-search")
 
@@ -385,15 +384,14 @@ def get_server() -> FastMCP:
         max_results: int = 10,
         sources: str = "digimart,ishibashi",
     ) -> dict:
-        """日本の複数店舗（デジマート+イシバシ楽器U-BOX）の中古楽器価格を横断比較します。
+        """Compare used musical instrument prices across Japanese shops (Digimart + Ishibashi U-BOX).
 
-        Fender、Gibsonなどのギター・ベース・アンプの店舗間価格差が分かります。
-        キーワード空欄で主要カテゴリ全体をスキャンします。
+        Guitars, basses and amps from Fender, Gibson, Rickenbacker, Ibanez, Martin, Taylor, Yamaha. Leave keyword empty to scan main categories.
 
         Args:
-            keyword: 検索キーワード（例: "Fender", "Gibson", "Rickenbacker"）。空欄=カテゴリスキャン
-            max_results: 取得する最大件数（デフォルト 10, 最大 50）
-            sources: 取得ソース（カンマ区切り: digimart, ishibashi）
+            keyword: search keyword (examples: Fender, Gibson, Rickenbacker). Empty = category scan
+            max_results: max number of results (default 10, max 50)
+            sources: comma-separated sources: digimart, ishibashi
         """
         await Actor.charge("instrument-market-search")
 
@@ -416,15 +414,14 @@ def get_server() -> FastMCP:
         max_results: int = 10,
         category: str = "",
     ) -> dict:
-        """日本の総合中古EC「オフモール」（ハードオフ公式・全国800店舗以上）を検索します。
+        """Search OffMall (Japan's largest 2nd-hand marketplace, Hard Off official, 800+ stores).
 
-        カメラ、時計、楽器、ブランド品、スマホ、ゲーム機など13カテゴリをカバーする
-        日本最大級のリユース市場。条件ランク（S/A/B/C）付きの実物中古品が検索できます。
+        Covers 13 categories — cameras, watches, instruments, luxury brands, smartphones, game consoles and more. Returns real physical used items with condition ranks (S/A/B/C).
 
         Args:
-            keyword: 検索キーワード（例: "iPhone", "ロレックス", "ニンテンドー"）。空欄+category指定でカテゴリスキャン
-            max_results: 取得する最大件数（デフォルト 10, 最大 50）
-            category: カテゴリ指定（キーワード空欄時）: カメラ, 時計, 楽器, ブランド品, スマートフォン・携帯電話, ゲーム機 など
+            keyword: search keyword (examples: iPhone, Rolex, Nintendo). Empty + category = category scan
+            max_results: max number of results (default 10, max 50)
+            category: category when keyword empty: カメラ, 時計, 楽器, ブランド品, スマートフォン・携帯電話, ゲーム機 など
         """
         await Actor.charge("offmall-market-search")
 
@@ -446,14 +443,13 @@ def get_server() -> FastMCP:
         keyword: str = "iPhone",
         max_results: int = 10,
     ) -> dict:
-        """日本の最大級価格比較サイト「価格.com」で商品の最安価格・店舗数・評価を検索します。
+        """Search Kakaku.com — Japan's largest price comparison site — for lowest prices, shop counts and ratings.
 
-        数千の日本国内オンライン店舗（Amazon, ヨドバシ, ビックカメラ, 楽天など）の集約価格を
-        一括で取得できるため、家電・スマホ・PCパーツなどの日本市場価格調査に最適です。
+        Aggregated prices from thousands of Japanese online stores (Amazon, Yodobashi, Bic Camera, Rakuten). Ideal for electronics, smartphones and PC parts price research.
 
         Args:
-            keyword: 検索キーワード（例: "iPhone", "PS5", "RTX 5080", "一眼レフ"）
-            max_results: 取得する最大件数（デフォルト 10, 最大 50）
+            keyword: search keyword (examples: iPhone, PS5, RTX 5080, SLR camera)
+            max_results: max number of results (default 10, max 50)
         """
         await Actor.charge("kakaku-price-search")
 
@@ -471,14 +467,13 @@ def get_server() -> FastMCP:
         body_type: str = "SUV",
         max_results: int = 10,
     ) -> dict:
-        """日本最大級の中古車ポータル「goo-net」で、車体タイプ別に在庫車両を検索します。
+        """Search goo-net — Japan's largest used car portal — by body type for current inventory.
 
-        車名・価格（円）・メーカー・販売店・詳細URLが取得できます。中古車輸出業者や
-        JDM（日本仕様車）調査、相場確認に最適です。
+        Returns car name, price (JPY), manufacturer, dealership and detail URL. Ideal for used car exporters, JDM (Japanese domestic market) research and market price checks.
 
         Args:
-            body_type: 車体タイプ（SUV, SEDAN, MINIVAN, KEI, WAGON, COUPE, COMPACT, OPEN, BUS, KEITRUCK）
-            max_results: 取得する最大件数（デフォルト 10, 最大 50）
+            body_type: vehicle body type (SUV, SEDAN, MINIVAN, KEI, WAGON, COUPE, COMPACT, OPEN, BUS, KEITRUCK)
+            max_results: max number of results (default 10, max 50)
         """
         await Actor.charge("car-market-search")
 
