@@ -41,6 +41,12 @@
       "eventDescription": "Goo-net used car search by body type",
       "eventPriceUsd": 0.001,
       "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "car-price-stats",
+      "eventDescription": "Goo-net used car price statistics by model keyword",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
     }
   ]
 }

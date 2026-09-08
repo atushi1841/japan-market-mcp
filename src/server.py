@@ -240,6 +240,52 @@ def _format_offmall_results(result: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_car_stats_results(result: dict[str, Any]) -> str:
+    """goo-net 相場集計（statsMode出力・単一statsアイテム）用フォーマッター。"""
+    items = result.get("items", [])
+    run_id = result.get("runId", "")
+    dataset_id = result.get("datasetId", "")
+    stats = items[0] if items and isinstance(items[0], dict) else {}
+    keyword = stats.get("keyword", "")
+    count = stats.get("count", 0)
+
+    if not count:
+        return (
+            f"**goo-net 中古車相場（{keyword}）**: サンプル0件（キーワードを見直してください）\n\n"
+            f"Run ID: `{run_id}`\nデータセット: `{dataset_id}`"
+        )
+
+    lines = [f"**goo-net 中古車相場 — {keyword}**（サンプル {count} 台）", ""]
+    for label, key in [
+        ("最安値", "priceMin"),
+        ("最高値", "priceMax"),
+        ("平均価格", "priceAvg"),
+        ("中央値", "priceMedian"),
+    ]:
+        lines.append(f"- {label}: {_fmt_price(stats.get(key))}")
+
+    samples = stats.get("sampleItems") or []
+    if samples:
+        lines.append("")
+        lines.append("サンプル車両:")
+        for i, s in enumerate(samples, 1):
+            title = s.get("title") or "（タイトルなし）"
+            price = s.get("price")
+            shop = s.get("shop") or ""
+            url = s.get("detailUrl") or ""
+            price_str = _fmt_price(price) if isinstance(price, (int, float)) else str(price or "?")
+            shop_str = f" [{shop}]" if shop else ""
+            lines.append(f"{i}. {title} — {price_str}{shop_str}")
+            if url:
+                lines.append(f"   [リンク]({url})")
+
+    lines.append("")
+    lines.append(f"集計時刻: {stats.get('collectedAt', '')}")
+    lines.append(f"Run ID: `{run_id}`")
+    lines.append(f"データセット: `{dataset_id}`")
+    return "\n".join(lines)
+
+
 def _format_kakaku_results(result: dict[str, Any]) -> str:
     """価格.com検索結果用フォーマッター（最安価格・店舗数・レビュー）"""
     items = result.get("items", [])
@@ -484,6 +530,33 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(GOO_NET_ACTOR_ID, actor_input, "Goo-net Japan Used Cars")
         text_output = _fmt_market_results(result, "中古車市場（goo-net 全国）")
+        return {"type": "text", "text": text_output, "structuredContent": result}
+
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def search_car_price_stats(
+        keyword: str = "N-BOX",
+        max_results: int = 30,
+    ) -> dict:
+        """Get used car market price statistics (min/max/avg/median JPY) for a model keyword from goo-net — Japan's largest used car portal.
+
+        Scrapes current listings matching the keyword (e.g. N-BOX, HARRIER, Alphard, Skyline) and aggregates price stats plus sample cars. Ideal for car resale pricing, JDM export valuation and market trend research.
+
+        Args:
+            keyword: car model keyword in Japanese or English (examples: N-BOX, ハイエース, クラウン, Skyline)
+            max_results: number of listings to sample for stats (default 30, max 100)
+        """
+        await Actor.charge("car-price-stats")
+
+        actor_input = {
+            "searchKeyword": keyword,
+            "statsMode": True,
+            "statsKeyword": keyword,
+            "maxItems": min(max_results, 100),
+            "maxPages": 3,
+            "proxyConfiguration": {"useApifyProxy": True},
+        }
+        result = await _call_actor(GOO_NET_ACTOR_ID, actor_input, "Goo-net Car Price Stats")
+        text_output = _format_car_stats_results(result)
         return {"type": "text", "text": text_output, "structuredContent": result}
 
     return server

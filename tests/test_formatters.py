@@ -21,6 +21,7 @@ from server import (
     _format_instrument_results,
     _format_offmall_results,
     _format_kakaku_results,
+    _format_car_stats_results,
 )
 
 
@@ -143,6 +144,46 @@ def test_format_kakaku_results():
     assert "4.25 (44)" in out
 
 
+def test_format_car_stats_results():
+    result = {
+        "items": [
+            {"statsType": "goo-net-car-price", "keyword": "N-BOX", "count": 28,
+             "priceMin": 198000, "priceMax": 2498000, "priceAvg": 1250000, "priceMedian": 1198000,
+             "sampleItems": [
+                 {"title": "ホンダ N-BOX カスタム G・Lパッケージ", "price": 1580000,
+                  "detailUrl": "https://example.com/car/1", "shop": "○○ショップ"},
+             ],
+             "collectedAt": "2026-09-08T00:00:00.000Z"},
+        ],
+        "runId": "run-stats-1",
+        "datasetId": "ds-stats-1",
+    }
+    out = _format_car_stats_results(result)
+    assert "goo-net 中古車相場" in out
+    assert "N-BOX" in out
+    assert "¥198,000" in out
+    assert "¥2,498,000" in out
+    assert "¥1,250,000" in out
+    assert "¥1,198,000" in out
+    assert "N-BOX カスタム" in out
+    assert "run-stats-1" in out
+
+
+def test_format_car_stats_results_empty():
+    result = {
+        "items": [
+            {"statsType": "goo-net-car-price", "keyword": "存在しない車種", "count": 0,
+             "priceMin": None, "priceMax": None, "priceAvg": None, "priceMedian": None,
+             "sampleItems": [], "collectedAt": "2026-09-08T00:00:00.000Z"},
+        ],
+        "runId": "run-stats-0",
+        "datasetId": "ds-stats-0",
+    }
+    out = _format_car_stats_results(result)
+    assert "サンプル0件" in out
+    assert "存在しない車種" in out
+
+
 if __name__ == "__main__":
     tests = [
         test_format_camera_results,
@@ -151,6 +192,8 @@ if __name__ == "__main__":
         test_format_instrument_results,
         test_format_offmall_results,
         test_format_kakaku_results,
+        test_format_car_stats_results,
+        test_format_car_stats_results_empty,
         test_format_empty,
     ]
     for t in tests:
