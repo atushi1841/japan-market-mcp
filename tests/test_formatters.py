@@ -184,6 +184,28 @@ def test_format_car_stats_results_empty():
     assert "存在しない車種" in out
 
 
+def test_format_car_stats_results_insufficient():
+    """count<20 (insufficientSample) must render a notice, NOT fake statistics."""
+    result = {
+        "items": [
+            {"statsType": "goo-net-car-price", "keyword": "レア車", "count": 5,
+             "insufficientSample": True,
+             "notice": "サンプル僅少のため統計値は返しません",
+             "priceMin": 100, "priceAvg": 200, "priceMedian": 150, "priceMax": 400,
+             "sampleItems": [], "collectedAt": "2026-09-08T00:00:00.000Z"},
+        ],
+        "runId": "run-stats-5",
+        "datasetId": "ds-stats-5",
+    }
+    out = _format_car_stats_results(result)
+    assert "サンプル僅少（5台 / 最低20台）" in out
+    assert "統計値は返しません" in out
+    assert "サンプル僅少のため統計値は返しません" in out
+    # must NOT render a numeric statistic block
+    assert "¥400" not in out
+    assert "¥150" not in out
+
+
 if __name__ == "__main__":
     tests = [
         test_format_camera_results,
