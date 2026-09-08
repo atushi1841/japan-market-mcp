@@ -248,8 +248,16 @@ def _format_car_stats_results(result: dict[str, Any]) -> str:
     stats = items[0] if items and isinstance(items[0], dict) else {}
     keyword = stats.get("keyword", "")
     count = stats.get("count", 0)
+    insufficient = bool(stats.get("insufficientSample"))
 
-    if not count:
+    if insufficient or not count:
+        if count:
+            notice = stats.get("notice") or "サンプルが不足しています"
+            return (
+                f"**goo-net 中古車相場（{keyword}）**: サンプル僅少（{count}台 / 最低20台）。"
+                f"統計値は返しません。\n\n> {notice}\n\n"
+                f"Run ID: `{run_id}`\nデータセット: `{dataset_id}`"
+            )
         return (
             f"**goo-net 中古車相場（{keyword}）**: サンプル0件（キーワードを見直してください）\n\n"
             f"Run ID: `{run_id}`\nデータセット: `{dataset_id}`"
