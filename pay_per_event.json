@@ -47,6 +47,18 @@
       "eventDescription": "Goo-net used car price statistics by model keyword",
       "eventPriceUsd": 0.001,
       "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "prize-giveaway-search",
+      "eventDescription": "Japan prize giveaway search (kenshou.club + cp.meikan.org)",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "prize-giveaway-stats",
+      "eventDescription": "Japan prize giveaway aggregate statistics by keyword",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
     }
   ]
 }

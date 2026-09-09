@@ -39,6 +39,7 @@ INSTRUMENT_ACTOR_ID = "yN1R26HrV6C2MBKas"      # japan-used-instrument-market-sc
 OFFMALL_ACTOR_ID = "Zh4kqcS4dYPWpFzBd"          # japan-offmall-market-scraper
 KAKAKU_ACTOR_ID = "XOqsB7rCHYrb42kcY"            # japan-kakaku-price-search
 GOO_NET_ACTOR_ID = "bgm5Gxn4BeBmoO7xD"           # goo-net-car-scraper
+PRIZE_ACTOR_ID = "FPlcw4CWMAKooZNe6"              # japan-prize-giveaway-scraper
 
 # Apify API エンドポイント
 APIFY_API_BASE = "https://api.apify.com/v2"
@@ -328,6 +329,68 @@ def _format_kakaku_results(result: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_prize_results(result: dict[str, Any]) -> str:
+    """国内懸賞/プレゼント応募情報（kenshou.club + cp.meikan.org）用フォーマッター。"""
+    items = result.get("items", [])
+    run_id = result.get("runId", "")
+    dataset_id = result.get("datasetId", "")
+    if not items:
+        return f"**国内懸賞・プレゼント情報**: 0件\n\nRun ID: `{run_id}`\nデータセット: `{dataset_id}`"
+
+    lines = [f"**国内懸賞・プレゼント応募情報**（{len(items)}件）", ""]
+    for i, it in enumerate(items, 1):
+        title = it.get("title") or "（タイトルなし）"
+        prize = it.get("prize") or ""
+        deadline = it.get("deadline") or ""
+        winners = it.get("winnerCount")
+        source = it.get("source", "")
+        x_url = it.get("xUrl", "")
+        prize_str = f" 賞品: {prize}" if prize else ""
+        win_str = f"当選数: {winners}名" if winners else ""
+        dl_str = f"締切: {deadline}" if deadline else ""
+        lines.append(f"{i}. **{title}**")
+        if prize_str:
+            lines.append(f"   {prize_str}")
+        meta = f"   {dl_str}  {win_str}  [{source}]"
+        lines.append(meta)
+        if x_url:
+            lines.append(f"   [X投稿]({x_url})")
+        lines.append("")
+    lines.append(f"Run ID: `{run_id}`")
+    lines.append(f"データセット: `{dataset_id}`")
+    return "\n".join(lines)
+
+
+def _format_prize_stats_results(result: dict[str, Any]) -> str:
+    """国内懸賞 statsMode出力（単一statsアイテム）用フォーマッター。"""
+    items = result.get("items", [])
+    run_id = result.get("runId", "")
+    dataset_id = result.get("datasetId", "")
+    stats = items[0] if items and isinstance(items[0], dict) else {}
+    keyword = stats.get("keyword", "")
+    count = stats.get("count", 0)
+    if not count:
+        return (
+            f"**国内懸賞相場（{keyword}）**: サンプル0件（キーワードを見直してください）\n\n"
+            f"Run ID: `{run_id}`\nデータセット: `{dataset_id}`"
+        )
+    sources = stats.get("sources") or {}
+    lines = [
+        f"**国内懸賞・プレゼント相場 — {keyword}**（{count}件）",
+        "",
+        f"- 有効件数: {stats.get('activeCount', 0)}",
+        f"- 総当選者数: {stats.get('totalWinnerCount', 0)}",
+        "- 収集源内訳:",
+    ]
+    for src, n in sources.items():
+        lines.append(f"  - {src}: {n}件")
+    lines.append("")
+    lines.append(f"集計時刻: {stats.get('collectedAt', '')}")
+    lines.append(f"Run ID: `{run_id}`")
+    lines.append(f"データセット: `{dataset_id}`")
+    return "\n".join(lines)
+
+
 # ──────────────────────────────────────────────
 # サーバー構築
 # ──────────────────────────────────────────────
@@ -565,6 +628,54 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(GOO_NET_ACTOR_ID, actor_input, "Goo-net Car Price Stats")
         text_output = _format_car_stats_results(result)
+        return {"type": "text", "text": text_output, "structuredContent": result}
+
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def search_japan_prize_giveaways(
+        keyword: str = "",
+        max_results: int = 10,
+    ) -> dict:
+        """Search current Japanese prize giveaways (懸賞/プレゼント応募) with deadlines — entries collected from kenshou.club and cp.meikan.org.
+
+        Returns the prize item, deadline, winner count, timeline source (X URL) and source site. Useful for finding giveaways with attractive prizes, expired-entry review and Japanese campaign monitoring.
+
+        Args:
+            keyword: optional filter keyword in Japanese or English (e.g. お米, 旅行, iPhone, カードキャプチャー). Empty returns all recent giveaways.
+            max_results: max number of results (default 10, max 50)
+        """
+        await Actor.charge("prize-giveaway-search")
+
+        actor_input = {
+            "keyword": keyword,
+            "maxItems": min(max_results, 50),
+            "maxPages": 2,
+        }
+        result = await _call_actor(PRIZE_ACTOR_ID, actor_input, "Japan Prize Giveaways")
+        text_output = _format_prize_results(result)
+        return {"type": "text", "text": text_output, "structuredContent": result}
+
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def get_japan_prize_giveaway_stats(
+        keyword: str = "",
+    ) -> dict:
+        """Get aggregate statistics on current Japanese prize giveaways (懸賞/プレゼント応募) — counts, active entries and total winners by source site.
+
+        Pulls recent giveaway listings matching the optional keyword and aggregates: total count, still-active count, cumulative winner slots, and a breakdown per source site (kenshou.club / cp.meikan.org). Ideal for campaign volume research and giveaway monitoring.
+
+        Args:
+            keyword: optional filter keyword in Japanese or English (e.g. お米, 最新ネタ, SUUMOクーポン). Empty returns stats over all recent giveaways.
+        """
+        await Actor.charge("prize-giveaway-stats")
+
+        actor_input = {
+            "keyword": keyword,
+            "statsMode": True,
+            "statsKeyword": keyword,
+            "maxItems": 50,
+            "maxPages": 2,
+        }
+        result = await _call_actor(PRIZE_ACTOR_ID, actor_input, "Japan Prize Giveaway Stats")
+        text_output = _format_prize_stats_results(result)
         return {"type": "text", "text": text_output, "structuredContent": result}
 
     return server

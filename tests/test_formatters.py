@@ -22,6 +22,8 @@ from server import (
     _format_offmall_results,
     _format_kakaku_results,
     _format_car_stats_results,
+    _format_prize_results,
+    _format_prize_stats_results,
 )
 
 
@@ -206,6 +208,77 @@ def test_format_car_stats_results_insufficient():
     assert "¥150" not in out
 
 
+def test_format_prize_results():
+    result = {
+        "items": [
+            {
+                "title": "【プレゼント】最新ネタ iPhone 15 Pro 抽選",
+                "prize": "iPhone 15 Pro 256GB",
+                "deadline": "2026-09-30",
+                "winnerCount": 3,
+                "source": "kenshou.club",
+                "xUrl": "https://x.com/account/status/111222333",
+            },
+            {
+                "title": "お米プレゼントキャンペーン",
+                "prize": "新潟コシヒカリ5kg",
+                "deadline": "2026-10-15",
+                "winnerCount": 100,
+                "source": "cp.meikan.org",
+                "xUrl": "https://x.com/account/status/444555666",
+            },
+        ],
+        "runId": "run-prize-1",
+        "datasetId": "ds-prize-1",
+    }
+    out = _format_prize_results(result)
+    assert "国内懸賞・プレゼント応募情報" in out
+    assert "iPhone 15 Pro 256GB" in out
+    assert "当選数: 3名" in out
+    assert "締切: 2026-09-30" in out
+    assert "kenshou.club" in out
+    assert "お米プレゼントキャンペーン" in out
+    assert "run-prize-1" in out
+
+
+def test_format_prize_stats_results():
+    result = {
+        "items": [
+            {
+                "statsType": "japan-prize-giveaway",
+                "keyword": "お米",
+                "count": 12,
+                "activeCount": 9,
+                "totalWinnerCount": 150,
+                "sources": {"kenshou.club": 7, "cp.meikan.org": 5},
+                "collectedAt": "2026-09-09T00:00:00.000Z",
+            }
+        ],
+        "runId": "run-prize-stats-1",
+        "datasetId": "ds-prize-stats-1",
+    }
+    out = _format_prize_stats_results(result)
+    assert "国内懸賞・プレゼント相場 — お米" in out
+    assert "有効件数: 9" in out
+    assert "総当選者数: 150" in out
+    assert "kenshou.club: 7件" in out
+    assert "cp.meikan.org: 5件" in out
+    assert "run-prize-stats-1" in out
+
+
+def test_format_prize_stats_results_empty():
+    result = {
+        "items": [
+            {"statsType": "japan-prize-giveaway", "keyword": "存在しない言葉", "count": 0}
+        ],
+        "runId": "run-prize-stats-2",
+        "datasetId": "ds-prize-stats-2",
+    }
+    out = _format_prize_stats_results(result)
+    assert "サンプル0件" in out
+    assert "存在しない言葉" in out
+
+
 if __name__ == "__main__":
     tests = [
         test_format_camera_results,
@@ -217,6 +290,9 @@ if __name__ == "__main__":
         test_format_car_stats_results,
         test_format_car_stats_results_empty,
         test_format_empty,
+        test_format_prize_results,
+        test_format_prize_stats_results,
+        test_format_prize_stats_results_empty,
     ]
     for t in tests:
         t()
