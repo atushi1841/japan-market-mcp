@@ -40,6 +40,7 @@ OFFMALL_ACTOR_ID = "Zh4kqcS4dYPWpFzBd"          # japan-offmall-market-scraper
 KAKAKU_ACTOR_ID = "XOqsB7rCHYrb42kcY"            # japan-kakaku-price-search
 GOO_NET_ACTOR_ID = "bgm5Gxn4BeBmoO7xD"           # goo-net-car-scraper
 PRIZE_ACTOR_ID = "FPlcw4CWMAKooZNe6"              # japan-prize-giveaway-scraper
+RAKUTEN_ACTOR_ID = "0eeiFH0nLqlWVoOAc"              # rakuten-japan-mcp (楽天市場公式API)
 
 # Apify API エンドポイント
 APIFY_API_BASE = "https://api.apify.com/v2"
@@ -391,6 +392,69 @@ def _format_prize_stats_results(result: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_rakuten_results(result: dict[str, Any]) -> str:
+    """楽天市場 商品検索結果用フォーマッター（公式API由来のフラットなitem）。"""
+    items = result.get("items", [])
+    run_id = result.get("runId", "")
+    dataset_id = result.get("datasetId", "")
+    if not items:
+        return f"**楽天市場 検索結果**: 0件\n\nRun ID: `{run_id}`\nデータセット: `{dataset_id}`"
+
+    lines = [f"**楽天市場（公式API）検索結果** ({len(items)}件)", ""]
+    for i, it in enumerate(items[:20], 1):
+        title = it.get("itemName", "（商品名なし）")
+        price = it.get("itemPrice")
+        shop = it.get("shopName", "")
+        review_avg = it.get("reviewAverage")
+        review_cnt = it.get("reviewCount")
+        url = it.get("itemUrl", "")
+        try:
+            price_str = f"¥{int(float(str(price))):,}"
+        except (TypeError, ValueError):
+            price_str = str(price or "?")
+        shop_str = f" [{shop}]" if shop else ""
+        review_str = f" 評価: {review_avg}({review_cnt}件)" if review_cnt else ""
+        lines.append(f"{i}. **{title}**{shop_str}")
+        lines.append(f"   価格: {price_str}{review_str}")
+        if url:
+            lines.append(f"   [リンク]({url})")
+        lines.append("")
+    if len(items) > 20:
+        lines.append(f"...他 {len(items) - 20} 件")
+    lines.append(f"Run ID: `{run_id}`")
+    lines.append(f"データセット: `{dataset_id}`")
+    return "\n".join(lines)
+
+
+def _format_rakuten_ranking_results(result: dict[str, Any]) -> str:
+    """楽天市場 ランキング結果用フォーマッター（rank付きitem）。"""
+    items = result.get("items", [])
+    run_id = result.get("runId", "")
+    dataset_id = result.get("datasetId", "")
+    if not items:
+        return f"**楽天市場 ランキング**: 0件\n\nRun ID: `{run_id}`\nデータセット: `{dataset_id}`"
+
+    lines = [f"**楽天市場 ランキング（公式API）** ({len(items)}件)", ""]
+    for it in items[:30]:
+        rank = it.get("rank", "?")
+        title = it.get("itemName", "（商品名なし）")
+        price = it.get("itemPrice")
+        shop = it.get("shopName", "")
+        url = it.get("itemUrl", "")
+        try:
+            price_str = f"¥{int(float(str(price))):,}"
+        except (TypeError, ValueError):
+            price_str = str(price or "?")
+        shop_str = f" [{shop}]" if shop else ""
+        lines.append(f"{rank}. **{title}** — {price_str}{shop_str}")
+        if url:
+            lines.append(f"   [リンク]({url})")
+    lines.append("")
+    lines.append(f"Run ID: `{run_id}`")
+    lines.append(f"データセット: `{dataset_id}`")
+    return "\n".join(lines)
+
+
 # ──────────────────────────────────────────────
 # サーバー構築
 # ──────────────────────────────────────────────
@@ -676,6 +740,72 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(PRIZE_ACTOR_ID, actor_input, "Japan Prize Giveaway Stats")
         text_output = _format_prize_stats_results(result)
+        return {"type": "text", "text": text_output, "structuredContent": result}
+
+    # ──────────────────────────────────────────────
+    # Tool 11: 楽天市場 商品検索（公式API）
+    # ──────────────────────────────────────────────
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def search_rakuten_items(
+        keyword: str = "PS5",
+        max_results: int = 10,
+        min_price: int | None = None,
+        max_price: int | None = None,
+        sort: str = "standard",
+    ) -> dict:
+        """Search Rakuten Ichiba (楽天市場) — Japan's largest e-commerce marketplace — via the OFFICIAL Rakuten API.
+
+        Returns product name, price (JPY), shop, review average/count and item URL. TOS-compliant (no HTML scraping). Ideal for retail price checks, product availability, shop comparison and Japanese market research.
+
+        Args:
+            keyword: search keyword in Japanese or English (examples: PS5, ルイヴィトン, 炊飯器)
+            max_results: max number of results (default 10, max 100)
+            min_price: minimum price filter in JPY (optional)
+            max_price: maximum price filter in JPY (optional)
+            sort: sort order — standard, +itemPrice, -itemPrice, reviewCount
+        """
+        await Actor.charge("rakuten-item-search")
+
+        actor_input: dict[str, Any] = {
+            "searchKeyword": keyword,
+            "maxResults": min(max_results, 100),
+        }
+        if min_price is not None:
+            actor_input["minPrice"] = min_price
+        if max_price is not None:
+            actor_input["maxPrice"] = max_price
+        if sort and sort != "standard":
+            actor_input["sortBy"] = sort
+        result = await _call_actor(RAKUTEN_ACTOR_ID, actor_input, "Rakuten Ichiba Item Search")
+        text_output = _format_rakuten_results(result)
+        return {"type": "text", "text": text_output, "structuredContent": result}
+
+    # ──────────────────────────────────────────────
+    # Tool 12: 楽天市場 ランキング（公式API）
+    # ──────────────────────────────────────────────
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def get_rakuten_ranking(
+        genre_id: int | None = None,
+        max_results: int = 30,
+    ) -> dict:
+        """Get the current Rakuten Ichiba (楽天市場) best-seller ranking via the OFFICIAL IchibaItem/Ranking API.
+
+        Returns rank, product name, price (JPY), shop and item URL for the top sellers — overall or per genre. TOS-compliant official API. Ideal for trend discovery, hot-product research and resale/arbitrage signals without any keyword.
+
+        Args:
+            genre_id: restrict to a genre (e.g. 100371=家電, 101347=おもちゃ, 101031=ゲーム, 101269=本・雑誌). None = overall ranking (総合).
+            max_results: number of ranked items to return (default 30, max 30 per API call)
+        """
+        await Actor.charge("rakuten-ranking")
+
+        actor_input: dict[str, Any] = {
+            "ranking": True,
+            "maxResults": min(max_results, 30),
+        }
+        if genre_id is not None:
+            actor_input["genreId"] = genre_id
+        result = await _call_actor(RAKUTEN_ACTOR_ID, actor_input, "Rakuten Ichiba Ranking")
+        text_output = _format_rakuten_ranking_results(result)
         return {"type": "text", "text": text_output, "structuredContent": result}
 
     return server

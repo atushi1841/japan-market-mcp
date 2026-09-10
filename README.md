@@ -4,7 +4,7 @@ An **MCP server** that lets AI agents (Claude, Cursor, VS Code Copilot, ChatGPT)
 
 ## How it works
 
-The server wraps 8 market-scraping actors behind one MCP endpoint. Each tool returns price, brand, shop, condition and a link per item, with the shop-pair crossed so you see the price spread at a glance.
+The server wraps market-scraping and official-API actors (Rakuten Ichiba included) behind one MCP endpoint. Each tool returns price, brand, shop, condition and a link per item, with the shop-pair crossed so you see the price spread at a glance.
 
 ## Available tools
 
@@ -18,6 +18,8 @@ The server wraps 8 market-scraping actors behind one MCP endpoint. Each tool ret
 | `search_kakaku_prices` | New price comparison | Kakaku.com (aggregated, thousands of shops) |
 | `search_car_market` | Used cars | goo-net (nationwide, by body type) |
 | `search_car_price_stats` | Used car price stats (min/max/avg/median JPY) | goo-net (by model keyword, e.g. N-BOX, Alphard) |
+| `search_rakuten_items` | New retail products (official API) | Rakuten Ichiba 楽天市場 (keyword, price range, sort) |
+| `get_rakuten_ranking` | Best-seller ranking (official API) | Rakuten Ichiba 楽天市場 (overall or by genre) |
 
 Each tool takes a keyword (e.g. `SONY α7`, `ROLEX`, `Hermes`, `Fender`) and returns results from the crossed shops. Leaving the keyword empty scans the full category.
 

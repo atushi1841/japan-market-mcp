@@ -59,6 +59,18 @@
       "eventDescription": "Japan prize giveaway aggregate statistics by keyword",
       "eventPriceUsd": 0.001,
       "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "rakuten-item-search",
+      "eventDescription": "Rakuten Ichiba product search via official Rakuten API",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "rakuten-ranking",
+      "eventDescription": "Rakuten Ichiba best-seller ranking via official Rakuten API",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
     }
   ]
 }

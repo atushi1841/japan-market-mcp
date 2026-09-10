@@ -24,6 +24,8 @@ from server import (
     _format_car_stats_results,
     _format_prize_results,
     _format_prize_stats_results,
+    _format_rakuten_results,
+    _format_rakuten_ranking_results,
 )
 
 
@@ -279,6 +281,79 @@ def test_format_prize_stats_results_empty():
     assert "存在しない言葉" in out
 
 
+def test_format_rakuten_results():
+    result = {
+        "items": [
+            {
+                "itemName": "ルイヴィトン アルマ BB モノグラム",
+                "itemPrice": 299200,
+                "itemUrl": "https://item.rakuten.co.jp/across/m46990/",
+                "shopName": "ブランドショップACROSS",
+                "reviewAverage": 4.5,
+                "reviewCount": 12,
+                "imageUrl": "https://thumbnail.image.rakuten.co.jp/@0_mall/across/x.jpg",
+            },
+            {
+                "itemName": "商品2",
+                "itemPrice": "5980",  # 文字列priceも許容
+                "itemUrl": "https://item.rakuten.co.jp/shop2/2/",
+                "shopName": "ショップ2",
+                "reviewAverage": 0.0,
+                "reviewCount": 0,
+            },
+        ],
+        "runId": "run-rk-1",
+        "datasetId": "ds-rk-1",
+    }
+    out = _format_rakuten_results(result)
+    assert "楽天市場（公式API）検索結果" in out
+    assert "ルイヴィトン アルマ BB" in out
+    assert "¥299,200" in out
+    assert "¥5,980" in out
+    assert "ブランドショップACROSS" in out
+    assert "評価: 4.5(12件)" in out
+    assert "run-rk-1" in out
+
+
+def test_format_rakuten_results_empty():
+    out = _format_rakuten_results({"items": [], "runId": "run-rk-2", "datasetId": "ds-rk-2"})
+    assert "0件" in out
+    assert "run-rk-2" in out
+
+
+def test_format_rakuten_ranking_results():
+    result = {
+        "items": [
+            {
+                "rank": 1,
+                "itemName": "ULRUBヘッドスクラブ",
+                "itemPrice": 4173,
+                "itemUrl": "https://item.rakuten.co.jp/churacos/r_ulrub/",
+                "shopName": "CHURACOS",
+            },
+            {
+                "rank": 2,
+                "itemName": "ランキング商品2",
+                "itemPrice": "1980",
+                "itemUrl": "",
+                "shopName": "",
+            },
+        ],
+        "runId": "run-rkr-1",
+        "datasetId": "ds-rkr-1",
+    }
+    out = _format_rakuten_ranking_results(result)
+    assert "楽天市場 ランキング（公式API）" in out
+    assert "1. **ULRUBヘッドスクラブ** — ¥4,173 [CHURACOS]" in out
+    assert "2. **ランキング商品2** — ¥1,980" in out
+    assert "run-rkr-1" in out
+
+
+def test_format_rakuten_ranking_results_empty():
+    out = _format_rakuten_ranking_results({"items": [], "runId": "r", "datasetId": "d"})
+    assert "0件" in out
+
+
 if __name__ == "__main__":
     tests = [
         test_format_camera_results,
@@ -293,6 +368,10 @@ if __name__ == "__main__":
         test_format_prize_results,
         test_format_prize_stats_results,
         test_format_prize_stats_results_empty,
+        test_format_rakuten_results,
+        test_format_rakuten_results_empty,
+        test_format_rakuten_ranking_results,
+        test_format_rakuten_ranking_results_empty,
     ]
     for t in tests:
         t()
