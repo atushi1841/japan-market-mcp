@@ -435,7 +435,14 @@ def _format_rakuten_ranking_results(result: dict[str, Any]) -> str:
         return f"**楽天市場 ランキング**: 0件\n\nRun ID: `{run_id}`\nデータセット: `{dataset_id}`"
 
     lines = [f"**楽天市場 ランキング（公式API）** ({len(items)}件)", ""]
-    for it in items[:30]:
+
+    def _rank_key(it: dict) -> int:
+        try:
+            return int(it.get("rank", 0) or 0)
+        except (TypeError, ValueError):
+            return 0
+
+    for it in sorted(items, key=_rank_key)[:30]:
         rank = it.get("rank", "?")
         title = it.get("itemName", "（商品名なし）")
         price = it.get("itemPrice")
