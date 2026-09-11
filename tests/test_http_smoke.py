@@ -64,7 +64,10 @@ async def main() -> int:
                                 "search_luxury_market", "search_instrument_market",
                                 "search_offmall_market", "search_kakaku_prices",
                                 "search_car_market", "search_car_price_stats",
-                                "search_japan_prize_giveaways", "get_japan_prize_giveaway_stats"}
+                                "search_japan_prize_giveaways", "get_japan_prize_giveaway_stats",
+                                "search_rakuten_items", "get_rakuten_ranking",
+                                "get_maff_market_report", "search_maff_price_trend",
+                                "get_maff_top_movers", "get_maff_markets"}
                     if expected.issubset(set(tool_names)):
                         green(f"tools/list returns {len(tool_names)} tools (all 6 expected)")
                     else:

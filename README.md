@@ -20,6 +20,10 @@ The server wraps market-scraping and official-API actors (Rakuten Ichiba include
 | `search_car_price_stats` | Used car price stats (min/max/avg/median JPY) | goo-net (by model keyword, e.g. N-BOX, Alphard) |
 | `search_rakuten_items` | New retail products (official API) | Rakuten Ichiba 楽天市場 (keyword, price range, sort) |
 | `get_rakuten_ranking` | Best-seller ranking (official API) | Rakuten Ichiba 楽天市場 (overall or by genre) |
+| `get_maff_market_report` | Fresh produce wholesale market report (official MAFF open data) | Japan central markets (旬別, JPY/100kg, YoY%) |
+| `search_maff_price_trend` | Fresh produce wholesale price trend (official MAFF open data) | Multi-market, multi-period comparison |
+| `get_maff_top_movers` | Fresh produce YoY price movers (official MAFF open data) | Japan central markets (supply-shock signal) |
+| `get_maff_markets` | List available MAFF wholesale markets | no charge |
 
 Each tool takes a keyword (e.g. `SONY α7`, `ROLEX`, `Hermes`, `Fender`) and returns results from the crossed shops. Leaving the keyword empty scans the full category.
 
@@ -63,6 +67,15 @@ Run it from the Apify Store (Run button), then point your MCP client at the endp
 
 "What's a used Fender Stratocaster going for?"
 → search_instrument_market(keyword="Fender Stratocaster")
+
+"Show this 旬's wholesale market report for Tokyo (Toyosu) fresh vegetables"
+→ get_maff_market_report(market="toyosu")
+
+"Which fresh produce items have spiked in price vs last year at Osaka?"
+→ get_maff_top_movers(market="oosakaho")
+
+"Track the price of daikon (だいこん) across Tokyo and Osaka this month"
+→ search_maff_price_trend(item="だいこん", markets=["toyosu","oosakaho"])
 ```
 
 ## Use cases
@@ -76,6 +89,7 @@ Run it from the Apify Store (Run button), then point your MCP client at the endp
 
 - Each actor collects **factual data only** (product name, price, brand, condition, inventory, URL). No photos or descriptions are harvested.
 - All target sites allow crawling via their `robots.txt`.
+- **MAFF 青果物卸売市場調査（旬別・市場別）** is served from the official 農林水産省 open-data CSV — no scraping, direct download. Published under the **Government Standard Terms of Use v2.0** (政府標準利用規約2.0): commercial use allowed with attribution. Price is JPY per 100kg. Data updates are published by MAFF each 旬 (10-day period).
 
 ## Local development
 

@@ -24,6 +24,19 @@ import httpx
 
 from fastmcp import FastMCP
 
+from src.maff_market import (
+    format_market_report,
+    format_movers,
+    format_trend,
+    latest_available_period,
+    list_markets,
+    fetch_market,
+    price_trend,
+    top_movers,
+    _period_label,
+    _prev_period,
+)
+
 # Apify ランタイムかローカル実行かを自動判定
 # 注意: main.py と判定条件を揃えること（APIFY_CONTAINER_PORT のみで本物を使う）
 if os.environ.get("APIFY_CONTAINER_PORT"):
@@ -814,5 +827,120 @@ def get_server() -> FastMCP:
         result = await _call_actor(RAKUTEN_ACTOR_ID, actor_input, "Rakuten Ichiba Ranking")
         text_output = _format_rakuten_ranking_results(result)
         return {"type": "text", "text": text_output, "structuredContent": result}
+
+    # ──────────────────────────────────────────────
+    # Tool 13-16: 青果物卸売市場調査（旬別・市場別） — MAFF公的統計API（出典: 農林水産省）
+    # ──────────────────────────────────────────────
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def get_maff_market_report(
+        market: str = "toyosu",
+        year: int = 0,
+        month: int = 0,
+        part: int = 0,
+        item: str | None = None,
+    ) -> dict:
+        """Japan wholesale vegetable/fruit market report (青果物卸売市場調査・旬別) from the OFFICIAL MAFF (農林水産省) open data API.
+        No auth, no scraping — direct download of the government statistics CSV (public data, TOS: 政府標準利用規約2.0). Returns per-item incoming quantity (tons) and wholesale price (JPY per 100kg) at a major central market, plus year-over-year and vs-previous-period price/quantity change %.
+
+        Args:
+            market: market slug — toyosu/oota/tosima/yodohasi (Tokyo), sapporo, sendai, yokohama, nagohon, nagohoku, kyoto, oosakaho, oosakato, kobe, kanazawa, hirosima, takamatu, kitakyu, hukuoka, okinawa
+            year: 4-digit year (default: latest published period). Leave 0 to auto-pick.
+            month: 1-12 month (default: latest published period). Leave 0 to auto-pick.
+            part: 旬 (10-day period) — 1=early, 2=middle, 3=late. 0 = auto (latest available).
+            item: optional item name filter (e.g. だいこん, にんじん, はくさい). Match is substring.
+        """
+        await Actor.charge("maff-market-report")
+
+        period = {"year": year, "month": month, "part": part}
+        if not (year and month and part):
+            latest = latest_available_period(market)
+            if not year:
+                period["year"] = latest["year"]
+            if not month:
+                period["month"] = latest["month"]
+            if not part:
+                period["part"] = latest["part"]
+        fetched = fetch_market(period, market)
+        text_output = format_market_report(period, market, fetched, item_filter=item)
+        return {
+            "type": "text",
+            "text": text_output,
+            "structuredContent": {
+                "market": market,
+                "period": _period_label(period),
+                "items": [r for r in fetched if r["isMarketTotal"]],
+            },
+        }
+
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def search_maff_price_trend(
+        item: str = "だいこん",
+        markets: list[str] = ["toyosu", "oosakaho"],
+        periods: int = 3,
+    ) -> dict:
+        """Wholesale price trend for a fresh vegetable/fruit item across major Japanese central markets, from the official MAFF open-data API (青果物卸売市場調査・旬別). No auth/scraping; direct government CSV. Returns the item's price (JPY per 100kg) and incoming quantity (tons) per period, per market, plus year-over-year change.
+
+        Args:
+            item: item name in Japanese (e.g. だいこん, にんじん, はくさい, きゅうり, トマト)
+            markets: list of market slugs (default toyosu + oosakaho). See get_maff_market_report for the full list.
+            periods: number of recent 旬 (10-day) periods to include (default 3, max 12).
+        """
+        await Actor.charge("maff-price-trend")
+
+        if not markets or not item:
+            return {"type": "text", "text": "itemとmarketsを指定してください。", "structuredContent": {}}
+        latest = latest_available_period(markets[0])
+        periods_list = []
+        p = dict(latest)
+        for _ in range(min(periods, 12)):
+            periods_list.append(dict(p))
+            p = _prev_period(p)
+        rows = price_trend(item, markets, periods_list)
+        text_output = format_trend(rows)
+        return {"type": "text", "text": text_output, "structuredContent": rows}
+
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def get_maff_top_movers(
+        market: str = "toyosu",
+        year: int = 0,
+        month: int = 0,
+        part: int = 0,
+        limit: int = 10,
+    ) -> dict:
+        """Items with the biggest year-over-year wholesale price change at a Japanese central market, from the official MAFF open-data API (青果物卸売市場調査・旬別). No auth/scraping; direct government CSV. Ranked by YoY price % — useful for supply-shock / inflation / harvest-disruption detection in Japanese fresh produce.
+
+        Args:
+            market: market slug (see get_maff_market_report)
+            year: 4-digit year (0 = latest published period, default)
+            month: 1-12 (0 = latest published period)
+            part: 旬 1/2/3 (0 = latest available)
+            limit: number of top movers to return (default 10, max 30)
+        """
+        await Actor.charge("maff-top-movers")
+
+        period = {"year": year, "month": month, "part": part}
+        if not (year and month and part):
+            latest = latest_available_period(market)
+            if not year:
+                period["year"] = latest["year"]
+            if not month:
+                period["month"] = latest["month"]
+            if not part:
+                period["part"] = latest["part"]
+        movers = top_movers(market, period, limit=min(limit, 30))
+        text_output = format_movers(movers, market, period)
+        return {"type": "text", "text": text_output, "structuredContent": movers}
+
+    @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
+    async def get_maff_markets() -> dict:
+        """List the Japanese central wholesale markets available in the MAFF 青果物卸売市場調査 MCP — market slugs + Japanese names + codes. No charge.
+
+        Returns the market list for use as the `market` argument of get_maff_market_report, search_maff_price_trend, and get_maff_top_movers.
+        """
+        markets = list_markets()
+        text = "**利用可能なMAFF卸売市場**\n\n" + "\n".join(
+            f"- `{r['market']}` — {r['name']}（code={r['code']}）" for r in markets
+        )
+        return {"type": "text", "text": text, "structuredContent": markets}
 
     return server

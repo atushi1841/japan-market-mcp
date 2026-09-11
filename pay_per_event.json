@@ -71,6 +71,24 @@
       "eventDescription": "Rakuten Ichiba best-seller ranking via official Rakuten API",
       "eventPriceUsd": 0.001,
       "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "maff-market-report",
+      "eventDescription": "MAFF wholesale vegetable/fruit market report (旬別, official open data)",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "maff-price-trend",
+      "eventDescription": "MAFF fresh produce wholesale price trend across markets",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
+    },
+    {
+      "eventTitle": "maff-top-movers",
+      "eventDescription": "MAFF fresh produce YoY price top movers at a market",
+      "eventPriceUsd": 0.001,
+      "isPrimaryEvent": true
     }
   ]
 }
