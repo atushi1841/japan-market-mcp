@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "japan-market-mcp": {
+      "name": "Japan Market MCP — Cross-Shop Price Comparison",
+      "type": "http",
+      "description": "Compare used-good prices across leading Japanese shops (cameras, watches, luxury brands, instruments, used cars), Kakaku.com, the official Rakuten Ichiba API, and MAFF fresh-produce wholesale market data — in single MCP tool calls for AI agents.",
+      "url": "https://fruitful-quintessence--japan-market-mcp.apify.actor/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_APIFY_API_TOKEN"
+      },
+      "tools": [
+        "search_camera_market",
+        "search_watch_market",
+        "search_luxury_market",
+        "search_instrument_market",
+        "search_offmall_market",
+        "search_kakaku_prices",
+        "search_car_market",
+        "search_car_price_stats",
+        "search_japan_prize_giveaways",
+        "get_japan_prize_giveaway_stats",
+        "search_rakuten_items",
+        "get_rakuten_ranking",
+        "get_maff_market_report",
+        "search_maff_price_trend",
+        "get_maff_top_movers",
+        "get_maff_markets"
+      ],
+      "pricing": "Pay-per-event: $0.001 per search",
+      "repo": "https://github.com/atushi1841/japan-market-mcp"
+    }
+  }
+}

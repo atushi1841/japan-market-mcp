@@ -18,6 +18,8 @@ The server wraps market-scraping and official-API actors (Rakuten Ichiba include
 | `search_kakaku_prices` | New price comparison | Kakaku.com (aggregated, thousands of shops) |
 | `search_car_market` | Used cars | goo-net (nationwide, by body type) |
 | `search_car_price_stats` | Used car price stats (min/max/avg/median JPY) | goo-net (by model keyword, e.g. N-BOX, Alphard) |
+| `search_japan_prize_giveaways` | Current JP prize giveaways with deadlines (懸賞/プレゼント) | kenshou.club + cp.meikan.org |
+| `get_japan_prize_giveaway_stats` | Aggregate giveaway stats (counts, active, winners) | kenshou.club + cp.meikan.org |
 | `search_rakuten_items` | New retail products (official API) | Rakuten Ichiba 楽天市場 (keyword, price range, sort) |
 | `get_rakuten_ranking` | Best-seller ranking (official API) | Rakuten Ichiba 楽天市場 (overall or by genre) |
 | `get_maff_market_report` | Fresh produce wholesale market report (official MAFF open data) | Japan central markets (旬別, JPY/100kg, YoY%) |
@@ -41,7 +43,7 @@ Run it from the Apify Store (Run button), then point your MCP client at the endp
 {
   "mcpServers": {
     "japan-market-mcp": {
-      "url": "https://fruitful_quintessence--japan-market-mcp.apify.actor/mcp",
+      "url": "https://fruitful-quintessence--japan-market-mcp.apify.actor/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_APIFY_TOKEN"
       }
@@ -52,6 +54,15 @@ Run it from the Apify Store (Run button), then point your MCP client at the endp
 
 - **URL**: `<your-username>--japan-market-mcp.apify.actor/mcp`
 - **Auth**: Apify API token in the `Authorization: Bearer` header (Apify Console → Settings → Integrations)
+
+> **URL note:** use a hyphen in the username (`fruitful-quintessence`), not an underscore — an underscore hostname will not resolve.
+
+## Discovery & registry
+
+- **Agent install guide:** see [`llms-install.md`](llms-install.md) — grounded guidance for AI agents (Cline, Claude Code, Cursor) that set up this server for a user.
+- **MCP discovery manifest:** `.well-known/mcp.json` advertises the endpoint, auth, tool list, and pricing in the standard MCP Directory discovery format.
+- **Cline MCP Marketplace:** submitted for review at [`cline/mcp-marketplace`](https://github.com/cline/mcp-marketplace/issues) — once approved it becomes one-click installable from Cline's marketplace.
+- **Apify Store:** deployed as the public actor [`fruitful_quintessence/japan-market-mcp`](https://apify.com/fruitful_quintessence/japan-market-mcp) (pay-per-event).
 
 ## Example agent prompts
 
