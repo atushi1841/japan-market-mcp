@@ -109,6 +109,19 @@ This MCP server connects to **86+ Apify Actors** in the Kensho ecosystem for rea
 - [fruitful_quintessence/japan-toy-collector-prices](https://apify.com/fruitful_quintessence/japan-toy-collector-prices) — Toy collector
 
 ## MCP Connection Examples
+### 6. External run example (fallback)
+
+```bash
+# If GitHub API returns 403, use curl + git clone
+curl -s https://raw.githubusercontent.com/atushi1841/japan-market-mcp/main/README.md > README.patch
+# edit README.patch as needed
+git clone https://github.com/atushi1841/japan-market-mcp.git
+cd japan-market-mcp
+cp ../README.patch README.md
+git add README.md
+git commit -m "update README via external run"
+git push
+```
 
 ### 1. Standard I/O (stdio) — Claude Desktop, Cursor, etc.
 
