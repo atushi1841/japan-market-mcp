@@ -217,3 +217,17 @@ APIFY_TOKEN=apify_api_xxx python -m src.main
 ## License
 
 MIT
+
+## Install via Smithery
+
+Connect this MCP server to your AI client (Claude Desktop, Cursor, VS Code) in one command:
+
+```bash
+npx @smithery/cli install atushi1841/japan-market-mcp --client claude
+```
+
+Replace `claude` with `cursor`, `vscode`, or `cline` for other clients.
+
+Alternatively, install directly from the [Smithery registry](https://smithery.ai/server/atushi1841/japan-market-mcp).
+
+> **Note:** Smithery server listing is pending verification. Once verified, this server will appear in search results with useCount tracking.
