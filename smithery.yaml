@@ -1,0 +1,15 @@
+# Smithery.ai configuration for japan-market-mcp MCP
+description: "Cross-shop price comparison for Japanese second-hand market. Tools: search_camera/watch/luxury/instrument/offmall/kakaku/car, rakuten, MAFF markets."
+repositoryUrl: https://github.com/atushi1841/japan-market-mcp
+iconUrl: https://raw.githubusercontent.com/atushi1841/japan-market-mcp/main/icon.png
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties: {}
+  commandFunction: |
+    (config) => ({
+      command: 'node',
+      args: ['${__dirname}/server.js']
+    })
+exampleConfig: {}
