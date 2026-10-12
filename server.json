@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.atushi1841/japan-market-mcp",
+  "description": "Compare used-good prices across 9 Japanese shops + Rakuten Ichiba, MAFF data, prize giveaways.",
+  "repository": {
+    "url": "https://github.com/atushi1841/japan-market-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "japan-market-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": []
+    }
+  ]
+}
