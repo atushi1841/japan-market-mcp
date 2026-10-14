@@ -2,9 +2,9 @@
   "manifest_version": "0.4",
   "name": "japan-market-mcp",
   "display_name": "Japan Market MCP — Cross-Shop Price Comparison for AI Agents",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Compare used-good prices across 9 leading Japanese shops (cameras, watches, luxury brands, instruments, used cars, off-malls) plus Rakuten Ichiba, MAFF wholesale data, and price comparison search — all via one MCP server. Each tool returns price, condition, shop, and link.",
-  "long_description": "# Japan Market MCP\n\nCompare used-good prices across leading Japanese shops in a single MCP tool call.\n\n## Tools (15)\n\n| Tool | Market |\n|------|--------|\n| `search_camera_market` | Used cameras & lenses (Kitamura + Fujiya) |\n| `search_watch_market` | Luxury watches (Jackroad + Kitamura) |\n| `search_luxury_market` | Used luxury brands (Komehyo + Jackroad) |\n| `search_instrument_market` | Used instruments (Digimart + Ishibashi) |\n| `search_offmall_market` | General used goods (Hard Off, 800+ stores) |\n| `search_kakaku_prices` | New price comparison (Kakaku.com) |\n| `search_car_market` | Used cars by body type (goo-net) |\n| `search_car_price_stats` | Used car price stats (min/max/avg/median) |\n| `search_japan_prize_giveaways` | Current JP prize giveaways with deadlines |\n| `get_japan_prize_giveaway_stats` | Aggregate giveaway stats by keyword |\n| `search_rakuten_items` | Rakuten Ichiba product search (official API) |\n| `get_rakuten_ranking` | Rakuten best-seller ranking (official API) |\n| `get_maff_market_report` | MAFF wholesale market report (open data) |\n| `search_maff_price_trend` | MAFF wholesale price trend (open data) |\n| `get_maff_top_movers` | MAFF YoY price top movers (open data) |\n| `get_maff_markets` | List available MAFF wholesale markets (open data) |\n\n## Pricing\n$0.001 per Apify event call. MAFF endpoints are free (open data).\n\n## Requirements\nPython >=3.10, uv. Set `APIFY_TOKEN` environment variable.\n\n## Repository\nhttps://github.com/atushi1841/japan-market-mcp\n\n## Apify Store\nhttps://apify.com/fruitful_quintessence/japan-market-mcp",
+  "long_description": "# Japan Market MCP\n\nCompare used-good prices across leading Japanese shops in a single MCP tool call.\n\n## Tools (14)\n\n| Tool | Market |\n|------|--------|\n| `search_camera_market` | Used cameras & lenses (Kitamura + Fujiya) |\n| `search_watch_market` | Luxury watches (Jackroad + Kitamura) |\n| `search_luxury_market` | Used luxury brands (Komehyo + Jackroad) |\n| `search_instrument_market` | Used instruments (Digimart + Ishibashi) |\n| `search_offmall_market` | General used goods (Hard Off, 800+ stores) |\n| `search_kakaku_prices` | New price comparison (Kakaku.com) |\n| `search_car_market` | Used cars by body type (goo-net) |\n| `search_car_price_stats` | Used car price stats (min/max/avg/median) |\n| `search_rakuten_items` | Rakuten Ichiba product search (official API) |\n| `get_rakuten_ranking` | Rakuten best-seller ranking (official API) |\n| `get_maff_market_report` | MAFF wholesale market report (open data) |\n| `search_maff_price_trend` | MAFF wholesale price trend (open data) |\n| `get_maff_top_movers` | MAFF YoY price top movers (open data) |\n| `get_maff_markets` | List available MAFF wholesale markets (open data) |\n\n## Pricing\n$0.001 per Apify event call. MAFF endpoints are free (open data).\n\n## Requirements\nPython >=3.10, uv. Set `APIFY_TOKEN` environment variable.\n\n## Repository\nhttps://github.com/atushi1841/japan-market-mcp\n\n## Apify Store\nhttps://apify.com/fruitful_quintessence/japan-market-mcp",
   "author": {
     "name": "atushi1841",
     "url": "https://github.com/atushi1841"
@@ -71,14 +71,6 @@
       "description": "Get used car market price statistics (min/max/avg/median JPY) for a model keyword from goo-net. Useful for arbitrage decisions."
     },
     {
-      "name": "search_japan_prize_giveaways",
-      "description": "Search current Japanese prize giveaways (懸賞/プレゼント応募) with deadlines — entries collected from kenshou.club and cp.meikan.org."
-    },
-    {
-      "name": "get_japan_prize_giveaway_stats",
-      "description": "Aggregate giveaway stats (counts, active, winners) by keyword from kenshou.club and cp.meikan.org."
-    },
-    {
       "name": "search_rakuten_items",
       "description": "Search Rakuten Ichiba products via official Rakuten API. Returns item name, price, shop, URL, review count."
     },
@@ -116,7 +108,6 @@
     "arbitrage",
     "market research",
     "MAFF",
-    "wholesale",
-    "prize giveaway"
+    "wholesale"
   ]
 }
