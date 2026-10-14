@@ -40,5 +40,5 @@ jobs:
         if: ${{ inputs.deprecate_version != '' }}
         run: |
           mcp-publisher status --status deprecated \
-            --message "旧版（懸賞ツールを含む）。最新版を使用してください。" \
+            --message "旧版（v0.1.0：給付キーワードを含む historical バージョン）。最新版を使用してください。" \
             io.github.atushi1841/japan-market-mcp ${{ inputs.deprecate_version }}
