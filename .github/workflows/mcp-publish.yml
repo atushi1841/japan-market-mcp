@@ -11,6 +11,14 @@ on:
         description: "deprecated にする旧バージョン（空なら何もしない）"
         type: string
         default: ""
+      status_version:
+        description: "status を変更するバージョン（空なら何もしない）"
+        type: string
+        default: ""
+      status_value:
+        description: "status_version に設定する値 (active|deprecated|deleted)"
+        type: string
+        default: ""
 
 permissions:
   id-token: write
@@ -42,3 +50,10 @@ jobs:
           mcp-publisher status --status deprecated \
             --message "旧版（懸賞ツールを含む）。最新版を使用してください。" \
             io.github.atushi1841/japan-market-mcp ${{ inputs.deprecate_version }}
+
+      - name: Set version status (active/deprecated/deleted)
+        if: ${{ inputs.status_version != '' && inputs.status_value != '' }}
+        run: |
+          mcp-publisher status --status ${{ inputs.status_value }} \
+            --message "懸賞ツールを含む旧版のため非公開化" \
+            io.github.atushi1841/japan-market-mcp ${{ inputs.status_version }}
