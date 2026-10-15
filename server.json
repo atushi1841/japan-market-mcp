@@ -6,13 +6,13 @@
     "url": "https://github.com/atushi1841/japan-market-mcp",
     "source": "github"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/atushi1841/japan-market-mcp/releases/download/v0.1.1/japan-market-mcp.mcpb",
-      "version": "0.1.1",
-      "fileSha256": "395d1179932d3e2301c66ead9d176a299274ef89961b847485608c8b0c886f83",
+      "identifier": "https://github.com/atushi1841/japan-market-mcp/releases/download/v0.1.2/japan-market-mcp.mcpb",
+      "version": "0.1.2",
+      "fileSha256": "71bdbc73a5a518985381b5a372b16f64ab42f5b5f39c3dcb942c2b0968fb8afe",
       "transport": {
         "type": "stdio"
       }
