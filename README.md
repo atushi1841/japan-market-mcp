@@ -229,3 +229,9 @@ Replace `claude` with `cursor`, `vscode`, or `cline` for other clients.
 Alternatively, install directly from the [Smithery registry](https://smithery.ai/server/atushi1841/japan-market-mcp).
 
 > **Note:** Smithery server listing is pending verification. Once verified, this server will appear in search results with useCount tracking.
+
+---
+## Data & Store
+
+- **Apify Store:** https://apify.com/fruitful_quintessence
+- **Gumroad datasets:** https://atushi5.gumroad.com/l/kutuxe
