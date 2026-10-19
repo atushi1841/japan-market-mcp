@@ -1,12 +1,12 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.atushi1841/japan-market-mcp",
-  "description": "Compare used-good prices across 9 Japanese shops + Rakuten Ichiba, MAFF data.",
+  "description": "Compare used-good prices across 9 Japanese shops + Rakuten Ichiba, MAFF data.\n\n- **Apify Store**: https://apify.com/fruitful_quintessence\n- **Gumroad**: https://atushi5.gumroad.com/l/kutuxe",
   "repository": {
     "url": "https://github.com/atushi1841/japan-market-mcp",
     "source": "github"
   },
-  "version": "0.1.2",
+  "version": "0.1.3",
   "packages": [
     {
       "registryType": "mcpb",
