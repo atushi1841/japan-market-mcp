@@ -1,12 +1,12 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.atushi1841/japan-market-mcp",
-  "description": "Compare used-good prices across 9 Japanese shops. Bulk data: https://atushi5.gumroad.com/l/agyhq\n\n- **Apify Store**: https://apify.com/fruitful_quintessence",
+  "description": "Compare used-good prices across 9 Japanese shops. Bulk data: https://atushi5.gumroad.",
   "repository": {
     "url": "https://github.com/atushi1841/japan-market-mcp",
     "source": "github"
   },
-  "version": "0.4.1",
+  "version": "0.4.2",
   "packages": [
     {
       "registryType": "mcpb",
