@@ -12,7 +12,7 @@
       "registryType": "mcpb",
       "identifier": "https://github.com/atushi1841/japan-market-mcp/releases/download/v0.4.0/japan-market-mcp.mcpb",
       "version": "0.4.0",
-      "fileSha256": "08c8caf6425e533246328a4d6e3e304e07497274cdd3f6305dcab70774953764",
+      "fileSha256": "7211bae2d6b5d8e04e22ff761f9d0e4f76f59d0de053181c8403a9e0c9db4a02",
       "transport": {
         "type": "stdio"
       }
