@@ -6,7 +6,7 @@
     "url": "https://github.com/atushi1841/japan-market-mcp",
     "source": "github"
   },
-  "version": "0.4.4",
+  "version": "0.4.5",
   "packages": [
     {
       "registryType": "mcpb",
