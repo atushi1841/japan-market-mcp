@@ -36,6 +36,7 @@ from src.maff_market import (
     _period_label,
     _prev_period,
 )
+from src.billing import billing_meta, billing_text
 
 # Apify ランタイムかローカル実行かを自動判定
 # 注意: main.py と判定条件を揃えること（APIFY_CONTAINER_PORT のみで本物を使う）
@@ -421,7 +422,11 @@ def get_server() -> FastMCP:
     FastMCP サーバーインスタンスを作成。
     この関数が main.py やテストから呼ばれる唯一のコントラクト。
     """
-    server = FastMCP("japan-market-mcp", "0.1.0")
+    server = FastMCP(
+        "japan-market-mcp",
+        "0.1.0",
+        instructions="Free live Japanese market data lookups. Weekly bulk CSV/JSON datasets: https://atushi5.gumroad.com/l/agyhq (free sample: https://atushi5.gumroad.com/l/kutuxe)"
+    )
 
     # ──────────────────────────────────────────────
     # Tool 1: 中古カメラ市場 横断比較
@@ -451,7 +456,7 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(CAMERA_ACTOR_ID, actor_input, "Japan Used Camera Market")
         text_output = _format_camera_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     # ──────────────────────────────────────────────
     # Tool 2: 中古時計市場 横断比較
@@ -481,7 +486,7 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(WATCH_ACTOR_ID, actor_input, "Japan Watch Market")
         text_output = _format_watch_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     # ──────────────────────────────────────────────
     # Tool 3: 中古ブランド品市場 横断比較
@@ -511,7 +516,7 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(LUXURY_ACTOR_ID, actor_input, "Japan Luxury Brand Market")
         text_output = _format_luxury_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     # ──────────────────────────────────────────────
     # Tool 4: 中古楽器市場 横断比較
@@ -541,7 +546,7 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(INSTRUMENT_ACTOR_ID, actor_input, "Japan Used Instrument Market")
         text_output = _format_instrument_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     # ──────────────────────────────────────────────
     # Tool 5: オフモール 中古総合マーケット
@@ -571,7 +576,7 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(OFFMALL_ACTOR_ID, actor_input, "Japan OffMall Used Goods Market")
         text_output = _format_offmall_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     # ──────────────────────────────────────────────
     # Tool 6: 価格.com キーワード価格検索
@@ -598,7 +603,7 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(KAKAKU_ACTOR_ID, actor_input, "Japan Kakaku Price Search")
         text_output = _format_kakaku_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
     async def search_car_market(
@@ -622,7 +627,7 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(GOO_NET_ACTOR_ID, actor_input, "Goo-net Japan Used Cars")
         text_output = _fmt_market_results(result, "中古車市場（goo-net 全国）")
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
     async def search_car_price_stats(
@@ -649,7 +654,7 @@ def get_server() -> FastMCP:
         }
         result = await _call_actor(GOO_NET_ACTOR_ID, actor_input, "Goo-net Car Price Stats")
         text_output = _format_car_stats_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     # ──────────────────────────────────────────────
     # Tool 11: 楽天市場 商品検索（公式API）
@@ -687,7 +692,7 @@ def get_server() -> FastMCP:
             actor_input["sortBy"] = sort
         result = await _call_actor(RAKUTEN_ACTOR_ID, actor_input, "Rakuten Ichiba Item Search")
         text_output = _format_rakuten_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     # ──────────────────────────────────────────────
     # Tool 12: 楽天市場 ランキング（公式API）
@@ -715,7 +720,7 @@ def get_server() -> FastMCP:
             actor_input["genreId"] = genre_id
         result = await _call_actor(RAKUTEN_ACTOR_ID, actor_input, "Rakuten Ichiba Ranking")
         text_output = _format_rakuten_ranking_results(result)
-        return {"type": "text", "text": text_output, "structuredContent": result}
+        return {"type": "text", "text": text_output, "structuredContent": result, "_pro": billing_meta()}
 
     # ──────────────────────────────────────────────
     # Tool 13-16: 青果物卸売市場調査（旬別・市場別） — MAFF公的統計API（出典: 農林水産省）
@@ -759,6 +764,7 @@ def get_server() -> FastMCP:
                 "period": _period_label(period),
                 "items": [r for r in fetched if r["isMarketTotal"]],
             },
+            "_pro": billing_meta(),
         }
 
     @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
@@ -777,7 +783,7 @@ def get_server() -> FastMCP:
         await Actor.charge("maff-price-trend")
 
         if not markets or not item:
-            return {"type": "text", "text": "itemとmarketsを指定してください。", "structuredContent": {}}
+            return {"type": "text", "text": "itemとmarketsを指定してください。", "structuredContent": {}, "_pro": billing_meta()}
         latest = latest_available_period(markets[0])
         periods_list = []
         p = dict(latest)
@@ -786,7 +792,7 @@ def get_server() -> FastMCP:
             p = _prev_period(p)
         rows = price_trend(item, markets, periods_list)
         text_output = format_trend(rows)
-        return {"type": "text", "text": text_output, "structuredContent": rows}
+        return {"type": "text", "text": text_output, "structuredContent": rows, "_pro": billing_meta()}
 
     @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
     async def get_maff_top_movers(
@@ -818,7 +824,7 @@ def get_server() -> FastMCP:
                 period["part"] = latest["part"]
         movers = top_movers(market, period, limit=min(limit, 30))
         text_output = format_movers(movers, market, period)
-        return {"type": "text", "text": text_output, "structuredContent": movers}
+        return {"type": "text", "text": text_output, "structuredContent": movers, "_pro": billing_meta()}
 
     @server.tool(annotations=_OPEN_WORLD_ANNOTATIONS)
     async def get_maff_markets() -> dict:
@@ -830,6 +836,6 @@ def get_server() -> FastMCP:
         text = "**利用可能なMAFF卸売市場**\n\n" + "\n".join(
             f"- `{r['market']}` — {r['name']}（code={r['code']}）" for r in markets
         )
-        return {"type": "text", "text": text, "structuredContent": markets}
+        return {"type": "text", "text": text, "structuredContent": markets, "_pro": billing_meta()}
 
     return server

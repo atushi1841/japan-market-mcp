@@ -1,18 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.atushi1841/japan-market-mcp",
-  "description": "Compare used-good prices across 9 Japanese shops + Rakuten Ichiba, MAFF data.\n\n- **Apify Store**: https://apify.com/fruitful_quintessence\n- **Gumroad**: https://atushi5.gumroad.com/l/kutuxe",
+  "description": "Compare used-good prices across 9 Japanese shops + Rakuten Ichiba, MAFF data.\n\n- **Apify Store**: https://apify.com/fruitful_quintessence\n- **Gumroad**: https://atushi5.gumroad.com/l/kutuxe\n- **Bulk weekly CSV/JSON datasets**: https://atushi5.gumroad.com/l/agyhq (free sample: https://atushi5.gumroad.com/l/kutuxe)",
   "repository": {
     "url": "https://github.com/atushi1841/japan-market-mcp",
     "source": "github"
   },
-  "version": "0.1.3",
+  "version": "0.4.0",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/atushi1841/japan-market-mcp/releases/download/v0.1.2/japan-market-mcp.mcpb",
-      "version": "0.1.2",
-      "fileSha256": "71bdbc73a5a518985381b5a372b16f64ab42f5b5f39c3dcb942c2b0968fb8afe",
+      "identifier": "https://github.com/atushi1841/japan-market-mcp/releases/download/v0.4.0/japan-market-mcp.mcpb",
+      "version": "0.4.0",
+      "fileSha256": "08c8caf6425e533246328a4d6e3e304e07497274cdd3f6305dcab70774953764",
       "transport": {
         "type": "stdio"
       }

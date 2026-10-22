@@ -2,8 +2,8 @@
   "manifest_version": "0.4",
   "name": "io.github.atushi1841/japan-market-mcp",
   "display_name": "Japan Market MCP",
-  "version": "0.1.2",
-  "description": "Compare used-good prices across 9 Japanese shops plus Rakuten and MAFF wholesale data.",
+  "version": "0.4.0",
+  "description": "Free live Japanese market data (Google Trends, anime figures, secondhand prices, FX, watch prices). Weekly bulk CSV/JSON datasets: https://atushi5.gumroad.com/l/agyhq (free sample: https://atushi5.gumroad.com/l/kutuxe)",
   "long_description": "# Japan Market MCP\n\nCompare used-good prices across leading Japanese shops in a single MCP tool call.\n\n## Tools (14)\n\n| Tool | Market |\n|------|--------|\n| `search_camera_market` | Used cameras & lenses (Kitamura + Fujiya) |\n| `search_watch_market` | Luxury watches (Jackroad + Kitamura) |\n| `search_luxury_market` | Used luxury brands (Komehyo + Jackroad) |\n| `search_instrument_market` | Used instruments (Digimart + Ishibashi) |\n| `search_offmall_market` | General used goods (Hard Off, 800+ stores) |\n| `search_kakaku_prices` | New price comparison (Kakaku.com) |\n| `search_car_market` | Used cars by body type (goo-net) |\n| `search_car_price_stats` | Used car price stats (min/max/avg/median) |\n| `search_rakuten_items` | Rakuten Ichiba product search (official API) |\n| `get_rakuten_ranking` | Rakuten best-seller ranking (official API) |\n| `get_maff_market_report` | MAFF wholesale market report (open data) |\n| `search_maff_price_trend` | MAFF wholesale price trend (open data) |\n| `get_maff_top_movers` | MAFF YoY price top movers (open data) |\n| `get_maff_markets` | List available MAFF wholesale markets (open data) |\n\n## Pricing\n$0.001 per Apify event call. MAFF endpoints are free (open data).\n\n## Requirements\nPython >=3.10, uv. Set `APIFY_TOKEN` environment variable.\n\n## Repository\nhttps://github.com/atushi1841/japan-market-mcp\n\n## Apify Store\nhttps://apify.com/fruitful_quintessence/japan-market-mcp",
   "author": {
     "name": "atushi1841",
@@ -40,59 +40,269 @@
   "tools": [
     {
       "name": "search_camera_market",
-      "description": "Compare used camera & lens prices across Japanese shops (Kitamura + Fujiya Camera). Returns price, condition, shop name, URL per item."
+      "description": "Compare used camera & lens prices across Japanese shops (Kitamura + Fujiya Camera). Returns price, condition, shop name, URL per item.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          },
+          "sources": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "keyword"
+        ]
+      }
     },
     {
       "name": "search_watch_market",
-      "description": "Compare luxury watch prices across Japanese shops (Jackroad + Kitamura used watches). Returns price, condition, shop name, URL per item."
+      "description": "Compare luxury watch prices across Japanese shops (Jackroad + Kitamura used watches). Returns price, condition, shop name, URL per item.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          },
+          "sources": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "keyword"
+        ]
+      }
     },
     {
       "name": "search_luxury_market",
-      "description": "Compare used luxury brand prices across Japanese shops (Komehyo + Jackroad). Returns price, condition, brand, shop name, URL per item."
+      "description": "Compare used luxury brand prices across Japanese shops (Komehyo + Jackroad). Returns price, condition, brand, shop name, URL per item.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          },
+          "sources": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "search_instrument_market",
-      "description": "Compare used musical instrument prices across Japanese shops (Digimart + Ishibashi U-BOX). Returns price, condition, shop name, URL per item."
+      "description": "Compare used musical instrument prices across Japanese shops (Digimart + Ishibashi U-BOX). Returns price, condition, shop name, URL per item.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          },
+          "sources": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "search_offmall_market",
-      "description": "Search OffMall (Japan's largest 2nd-hand marketplace, Hard Off official, 800+ stores). Returns price, condition, shop, URL per item."
+      "description": "Search OffMall (Japan's largest 2nd-hand marketplace, Hard Off official, 800+ stores). Returns price, condition, shop, URL per item.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          },
+          "category": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "search_kakaku_prices",
-      "description": "Search Kakaku.com — Japan's largest price comparison site — for lowest prices, shop counts and ratings."
+      "description": "Search Kakaku.com — Japan's largest price comparison site — for lowest prices, shop counts and ratings.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "search_car_market",
-      "description": "Search goo-net — Japan's largest used car portal — by body type for current inventory. Returns price, mileage, condition, shop, URL per item."
+      "description": "Search goo-net — Japan's largest used car portal — by body type for current inventory. Returns price, mileage, condition, shop, URL per item.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body_type": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "search_car_price_stats",
-      "description": "Get used car market price statistics (min/max/avg/median JPY) for a model keyword from goo-net. Useful for arbitrage decisions."
+      "description": "Get used car market price statistics (min/max/avg/median JPY) for a model keyword from goo-net. Useful for arbitrage decisions.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "search_rakuten_items",
-      "description": "Search Rakuten Ichiba products via official Rakuten API. Returns item name, price, shop, URL, review count."
+      "description": "Search Rakuten Ichiba products via official Rakuten API. Returns item name, price, shop, URL, review count.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          },
+          "min_price": {
+            "type": "string"
+          },
+          "max_price": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "get_rakuten_ranking",
-      "description": "Get Rakuten Ichiba best-seller ranking via official API. Returns top items by genre."
+      "description": "Get Rakuten Ichiba best-seller ranking via official API. Returns top items by genre.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "genre_id": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "get_maff_market_report",
-      "description": "MAFF wholesale vegetable/fruit market report (旬別, official open data). Returns JPY/100kg and YoY% per market."
+      "description": "MAFF wholesale vegetable/fruit market report (旬別, official open data). Returns JPY/100kg and YoY% per market.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "month": {
+            "type": "integer"
+          },
+          "part": {
+            "type": "integer"
+          },
+          "item": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "search_maff_price_trend",
-      "description": "MAFF fresh produce wholesale price trend across markets and periods. Official open data."
+      "description": "MAFF fresh produce wholesale price trend across markets and periods. Official open data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "markets": {
+            "type": "array"
+          },
+          "periods": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "get_maff_top_movers",
-      "description": "MAFF fresh produce YoY price top movers at a market. Supply-shock signal. Official open data."
+      "description": "MAFF fresh produce YoY price top movers at a market. Supply-shock signal. Official open data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "month": {
+            "type": "integer"
+          },
+          "part": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
     },
     {
       "name": "get_maff_markets",
-      "description": "List available MAFF wholesale markets nationwide. No API key required."
+      "description": "List available MAFF wholesale markets nationwide. No API key required.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
     }
   ],
   "keywords": [
